@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>설교일지 v1.12 · Firestore 동기화</title>
+  <title>설교일지 v1.13 · Firestore 동기화</title>
   <style>
     :root{
       --bg:#f6f4ef;--paper:#fffdf8;--card:#fff;--ink:#1d211f;--muted:#6f746f;--line:#e2ddd2;
@@ -56,11 +56,11 @@
 <body data-mobile-panel="edit">
   <div class="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.12</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
+      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.13</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
       <div class="top-actions">
         <span class="pill"><span id="syncDot" class="dot warn"></span><span id="syncText">연결 준비</span></span>
         <span class="pill hide-mobile" id="countPill">0편</span>
-        <div class="room-box" title="같은 방 코드를 쓰면 PC와 모바일이 같은 Firestore 문서를 봅니다."><input id="roomInput" aria-label="방 코드" placeholder="room" /><button class="btn small secondary" id="btnRoom">방 적용</button></div>
+        <div class="room-box" title="같은 방 코드를 쓰면 PC와 모바일이 같은 Firestore 문서를 봅니다."><input id="roomInput" aria-label="방 코드" placeholder="sermon-log" /><button class="btn small secondary" id="btnRoom">방 적용</button></div>
         <button class="btn small secondary" id="btnBible" title="성경검색 열기 Ctrl+B">성경</button>
         <button class="btn small secondary" id="btnGpt" title="GPT 링크 열기 Ctrl+G">GPT</button>
         <button class="btn small secondary" id="btnGemini" title="Gemini 열기 Ctrl+Y">Gemini</button>
@@ -265,7 +265,7 @@ service cloud.firestore {
     let saveTimer = null;
     let typingRenderHoldUntil = 0;
     const remoteSaveTimers = new Map();
-    const state = { sermons:{}, currentId:null, room:sanitizeRoom(localStorage.getItem(ROOM_KEY)||DEFAULT_ROOM), updateNotes:"", updateSavedAt:"", updateHistory:[], reflectionBox:[], prepQuestionBox:[], ready:false, uid:null, deletedIds:new Set() };
+    const state = { sermons:{}, currentId:null, room:getInitialRoom(), updateNotes:"", updateSavedAt:"", updateHistory:[], reflectionBox:[], prepQuestionBox:[], ready:false, uid:null, deletedIds:new Set() };
     const $ = (id) => document.getElementById(id);
     const els = {
       syncDot:$("syncDot"), syncText:$("syncText"), countPill:$("countPill"), roomInput:$("roomInput"), listCount:$("listCount"), sermonList:$("sermonList"), searchInput:$("searchInput"), filterStructure:$("filterStructure"), sortMode:$("sortMode"), statsBox:$("statsBox"),
@@ -410,6 +410,12 @@ service cloud.firestore {
       els.questionBankCategory.value = categories.has(keep) ? keep : "current";
     }
 
+    function getInitialRoom(){
+      const raw = localStorage.getItem(ROOM_KEY);
+      // 예전 버전에서 입력창 안내문처럼 room 값이 저장된 경우, 기존 기본 방인 sermon-log로 복구합니다.
+      return sanitizeRoom(!raw || raw === "room" ? DEFAULT_ROOM : raw);
+    }
+
     async function initFirebase(){
       try{
         setStatus("Firebase 연결 중","warn");
@@ -436,7 +442,7 @@ service cloud.firestore {
         snap.forEach(d => {
           if(d.id === UPDATE_DOC_ID){ const data=d.data()||{}; const editingUpdate=els.updateModal?.classList.contains("open") && document.activeElement===els.updateNotes; state.updateHistory=mergeUpdateHistories(state.updateHistory, data.history||[], recoverUpdateHistoriesFromLocalStorage()); if(!editingUpdate){ state.updateNotes=data.text||""; if(els.updateModal?.classList.contains("open")) els.updateNotes.value=state.updateNotes; } else { state.updateNotes=els.updateNotes.value; } state.updateSavedAt=data.updatedAtClient||""; state.reflectionBox=mergeQuestionBoxes(state.reflectionBox, data.reflectionBox||[]); state.prepQuestionBox=mergeQuestionBoxes(state.prepQuestionBox, data.prepQuestionBox||[]); saveLocal(); return; }
           const data = d.data()||{};
-          if(data.deleted || state.deletedIds.has(d.id)) return;
+          if(data.deleted) return;
           const remote = normalizeSermon({ id:d.id, ...data });
           if(!hasSermonContent(remote)) return;
           const local = state.sermons[d.id];
@@ -459,7 +465,7 @@ service cloud.firestore {
     function firestoreErrorMessage(err){ const code=err?.code||""; if(code.includes("permission")) return "권한/규칙 확인"; if(code.includes("unavailable")) return "연결 불안정"; if(code.includes("failed-precondition")) return "Firestore 설정 확인"; return "동기화 오류"; }
     function shouldAvoidEditorRefresh(){ const a=document.activeElement; return a && ["INPUT","TEXTAREA","SELECT"].includes(a.tagName) && !a.closest(".modal") && !a.closest(".modal-backdrop"); }
     function setStatus(text,type){ els.syncText.textContent=text; els.syncDot.className="dot "+(type||"warn"); }
-    function applyRoom(){ const room=sanitizeRoom(els.roomInput.value||DEFAULT_ROOM); clearTimeout(saveTimer); state.room=room; localStorage.setItem(ROOM_KEY,room); state.currentId=null; state.sermons={}; saveLocal(); renderAll(); if(state.ready) subscribeRoom(); }
+    function applyRoom(){ const room=sanitizeRoom(els.roomInput.value||DEFAULT_ROOM); clearTimeout(saveTimer); state.room=room; localStorage.setItem(ROOM_KEY,room); state.currentId=null; state.sermons={}; state.deletedIds=new Set(); saveLocal(); renderAll(); setStatus(`${room} 방 불러오는 중`,`warn`); if(state.ready) subscribeRoom(); }
     function sanitizeRoom(v){ return String(v||DEFAULT_ROOM).trim().replace(/[\\/#?\[\]*]/g,"_").replace(/\s+/g,"-").slice(0,60) || DEFAULT_ROOM; }
 
     function defaultSermon(){
@@ -851,8 +857,7 @@ service cloud.firestore {
     function drawCanvasBlock(ctx,text,x,y,maxWidth,lineHeight,maxLines=6){
       const raw=String(text||"").trim(); if(!raw) return y;
       const lines=[];
-      raw.split(/
-+/).forEach(paragraph=>{
+      raw.split(/\n+/).forEach(paragraph=>{
         let line="";
         String(paragraph).trim().split(/\s+/).filter(Boolean).forEach(word=>{
           const test=line?line+" "+word:word;
@@ -972,22 +977,32 @@ service cloud.firestore {
       }
     }
     async function saveUpdateLog(){
-      const text=(els.updateNotes.value||"").trim();
+      // Ctrl+S / 저장 버튼은 “현재 업데이트 메모를 저장”만 합니다.
+      // 다음 버전으로 넘길 때는 [이전기록으로 백업]을 눌러 이력에 보관하고 메모장을 비웁니다.
       state.updateHistory=mergeUpdateHistories(state.updateHistory, recoverUpdateHistoriesFromLocalStorage());
-      if(text){
-        const item={id:uid(),version:(state.updateHistory?.length||0)+1,archivedAt:new Date().toISOString(),summary:summarizeUpdateText(text),text};
-        state.updateHistory=mergeUpdateHistories([item], state.updateHistory);
-      }
+      state.updateNotes=els.updateNotes.value || "";
+      state.updateSavedAt=new Date().toISOString();
+      els.updateSavedAt.textContent=state.updateNotes.trim()
+        ? `저장 완료: ${formatDateTime(state.updateSavedAt)} · 현재 메모는 다음 업데이트 전까지 유지됩니다.`
+        : `저장 완료: ${formatDateTime(state.updateSavedAt)} · 현재 메모가 비어 있습니다.`;
+      await saveSystemDoc();
+      renderUpdatePreview();
+      setStatus("업데이트 메모 저장됨","ok");
+    }
+    async function archiveUpdateLog(){
+      const text=els.updateNotes.value.trim();
+      if(!text) return alert("백업할 업데이트 기록이 없습니다.");
+      state.updateHistory=mergeUpdateHistories(state.updateHistory, recoverUpdateHistoriesFromLocalStorage());
+      const item={id:uid(),version:(state.updateHistory?.length||0)+1,archivedAt:new Date().toISOString(),summary:summarizeUpdateText(text),text};
+      state.updateHistory=mergeUpdateHistories([item], state.updateHistory);
       state.updateNotes="";
       state.updateSavedAt=new Date().toISOString();
       els.updateNotes.value="";
-      els.updateSavedAt.textContent=text ? "저장 완료: 현재 메모는 비우고 이전 이력에 백업했습니다." : "저장 완료: 현재 메모가 비어 있습니다.";
+      els.updateSavedAt.textContent="이전 기록으로 백업 완료: 새 업데이트 메모를 작성할 수 있습니다.";
       await saveSystemDoc();
       renderUpdatePreview();
-      setStatus(text?"업데이트 기록 백업 완료":"업데이트 기록 비움","ok");
-      // 창은 닫지 않고 비워진 메모장 상태를 유지합니다.
+      setStatus("이전 기록으로 백업 완료","ok");
     }
-    async function archiveUpdateLog(){ const text=els.updateNotes.value.trim(); if(!text) return alert("백업할 업데이트 기록이 없습니다."); state.updateHistory=mergeUpdateHistories(state.updateHistory, recoverUpdateHistoriesFromLocalStorage()); const item={id:uid(),version:(state.updateHistory?.length||0)+1,archivedAt:new Date().toISOString(),summary:summarizeUpdateText(text),text}; state.updateHistory=mergeUpdateHistories([item], state.updateHistory); state.updateNotes=""; state.updateSavedAt=new Date().toISOString(); els.updateNotes.value=""; await saveSystemDoc(); renderUpdatePreview(); setStatus("이전 기록으로 백업 완료","ok"); }
     function renderUpdatePreview(){ const text=(state.updateNotes||"").trim(); els.updatePreview.textContent=text ? text.slice(-620) : "업데이트 버튼으로 기록을 남길 수 있습니다."; const hist=state.updateHistory||[]; if(els.updateHistoryCount) els.updateHistoryCount.textContent=`${hist.length}회`; if(els.updateHistoryList){ els.updateHistoryList.innerHTML=hist.length?"":`<div class="empty">백업된 업데이트 이력이 없습니다.</div>`; hist.forEach(h=>{ const div=document.createElement("div"); div.className="history-item"; div.innerHTML=`<b>v${escapeHtml(h.version||"")} · ${escapeHtml(formatDateTime(h.archivedAt||""))}</b><p>${escapeHtml(h.summary||summarizeUpdateText(h.text||""))}</p><details><summary>전체 내용</summary><div class="hint" style="white-space:pre-wrap">${escapeHtml(h.text||"")}</div></details>`; els.updateHistoryList.appendChild(div); }); } }
     function openHelp(){ els.helpModal.classList.add("open"); }
     function closeHelp(){ els.helpModal.classList.remove("open"); }
@@ -1039,7 +1054,7 @@ service cloud.firestore {
       else { (e.shiftKey ? textareas[textareas.length-1] : textareas[0])?.focus(); }
     }
 
-    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:12,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
+    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:13,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
     async function importJson(){ const file=els.importFile.files?.[0]; if(!file) return alert("불러올 JSON 파일을 선택하세요."); try{ const data=JSON.parse(await file.text()); const arr=Array.isArray(data)?data:(data.sermons||[]); if(data.updateNotes){ state.updateNotes=data.updateNotes; } if(Array.isArray(data.updateHistory)) state.updateHistory=data.updateHistory; if(Array.isArray(data.reflectionBox)) state.reflectionBox=mergeQuestionBoxes(state.reflectionBox,data.reflectionBox); if(Array.isArray(data.prepQuestionBox)) state.prepQuestionBox=mergeQuestionBoxes(state.prepQuestionBox,data.prepQuestionBox); await saveSystemDoc(); renderUpdatePreview(); renderReflectionBox(); if(!arr.length) return alert("설교일지 데이터가 없습니다."); for(const item of arr){ const id=item.id||uid(); const s=normalizeSermon({...item,id,localOnly:false,updatedAtClient:new Date().toISOString()}); state.sermons[id]=s; await saveSermon(s); } state.currentId=arr[0].id; saveLocal(); renderAll(); alert("백업을 불러왔습니다."); }catch(e){ console.error(e); alert("JSON 파일을 읽지 못했습니다."); } }
 
     function handleShortcuts(e){
