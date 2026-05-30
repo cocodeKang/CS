@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>설교일지 · Firestore 동기화</title>
+  <title>설교일지 v1.8 · Firestore 동기화</title>
   <style>
     :root{
       --bg:#f6f4ef;--paper:#fffdf8;--card:#fff;--ink:#1d211f;--muted:#6f746f;--line:#e2ddd2;
@@ -18,7 +18,7 @@
     .app{min-height:100vh;display:flex;flex-direction:column}
     .topbar{position:sticky;top:0;z-index:30;background:rgba(246,244,239,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between}
     .brand{display:flex;align-items:center;gap:10px;min-width:0}.brand-mark{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#a6a66f);display:grid;place-items:center;color:#fff;font-weight:900;box-shadow:var(--shadow)}
-    .brand h1{font-size:18px;line-height:1.1;margin:0;white-space:nowrap}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+    .brand h1{font-size:18px;line-height:1.1;margin:0;white-space:nowrap}.version-badge{display:inline-flex;align-items:center;margin-left:6px;padding:2px 7px;border-radius:999px;background:#eef2e8;color:#5d6f4f;border:1px solid #d8e2cc;font-size:11px;font-weight:900;vertical-align:middle}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
     .top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:12px;color:var(--muted);white-space:nowrap}.dot{width:8px;height:8px;border-radius:99px;background:#aaa;display:inline-block}.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.bad{background:var(--danger)}
     .btn{padding:9px 12px;border-radius:12px;background:var(--accent);color:#fff;font-weight:800;box-shadow:0 6px 16px rgba(80,92,65,.13)}.btn:hover{filter:brightness(.96)}.btn.secondary{background:var(--paper);color:var(--ink);border:1px solid var(--line);box-shadow:none}.btn.ghost{background:transparent;color:var(--accent);box-shadow:none;border:1px solid transparent}.btn.danger{background:var(--danger)}.btn.small{padding:6px 9px;border-radius:10px;font-size:12px}.btn.gold{background:var(--accent2)}
     .room-box{display:flex;gap:6px;align-items:center}.room-box input{width:130px;padding:7px 9px;border-radius:999px;font-size:12px;background:#fff}
@@ -32,7 +32,7 @@
     .tabs{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);background:#fffdf8}.tab{padding:8px 10px;border-radius:999px;background:transparent;color:var(--muted);font-size:13px;font-weight:800}.tab.active{background:var(--accent);color:#fff}.view{display:none}.view.active{display:block}.editor-scroll{max-height:calc(100vh - 165px);overflow:auto}.right-scroll{max-height:calc(100vh - 165px);overflow:auto}
     .manuscript{min-height:520px;font-family:var(--serif);font-size:17px;line-height:1.9;padding:18px;background:#fffefb}.manuscript-tools{position:sticky;top:0;background:#fff;z-index:3;padding:10px;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}.paper-preview{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:inset 0 0 0 1px #fff;margin-top:10px}.paper-preview h3{margin:0 0 10px;font-size:20px}.paper-meta{font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}.paper-content{white-space:pre-wrap;font-family:var(--serif);line-height:1.9;font-size:16px}
     .question-card{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fffdf8;margin-bottom:10px}.question-card b{font-size:13px}.question-card textarea{margin-top:8px;min-height:80px;background:#fff}.question-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}.checkline{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);font-weight:800}.checkline input{width:18px;height:18px;accent-color:var(--accent)}
-    .todo-row,.feedback-card{border:1px solid var(--line);border-radius:16px;background:#fffdf8;padding:12px;margin-bottom:10px}.todo-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start}.todo-row input[type=checkbox]{width:22px;height:22px;margin-top:3px;accent-color:var(--accent)}.todo-title{font-weight:800}.todo-done .todo-title{text-decoration:line-through;color:var(--muted)}.todo-meta{font-size:12px;color:var(--muted);margin-top:3px}.feedback-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}.feedback-title{font-weight:900}.feedback-text{white-space:pre-wrap;line-height:1.5}.feedback-reflect{margin-top:8px;background:#f7f6f0;border-radius:12px;padding:8px}.feedback-reflect label{font-size:11px;color:var(--muted);font-weight:900}.feedback-reflect textarea{min-height:72px;margin-top:5px;background:#fff}.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;background:#eee9dc;color:#5c5243;font-size:11px;font-weight:800}
+    .todo-row,.feedback-card,.quiz-card{border:1px solid var(--line);border-radius:16px;background:#fffdf8;padding:12px;margin-bottom:10px}.todo-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start}.todo-row input[type=checkbox]{width:22px;height:22px;margin-top:3px;accent-color:var(--accent)}.todo-title{font-weight:800}.todo-done .todo-title{text-decoration:line-through;color:var(--muted)}.todo-meta{font-size:12px;color:var(--muted);margin-top:3px}.feedback-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}.feedback-title{font-weight:900}.feedback-text{white-space:pre-wrap;line-height:1.5}.feedback-reflect{margin-top:8px;background:#f7f6f0;border-radius:12px;padding:8px}.feedback-reflect label{font-size:11px;color:var(--muted);font-weight:900}.feedback-reflect textarea{min-height:72px;margin-top:5px;background:#fff}.quiz-card h4{margin:0 0 8px;font-size:14px}.quiz-question{white-space:pre-wrap;line-height:1.55;font-weight:800}.quiz-options,.quiz-answer,.quiz-feedback{white-space:pre-wrap;font-size:12px;color:var(--muted);margin-top:6px}.quiz-feedback{background:#f7f6f0;border-radius:12px;padding:8px}.quiz-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;background:#eee9dc;color:#5c5243;font-size:11px;font-weight:800}
     .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{border:1px solid var(--line);border-radius:14px;background:#fffdf8;padding:11px}.stat b{font-size:20px;display:block}.stat span{font-size:11px;color:var(--muted)}
     details{border:1px solid var(--line);border-radius:14px;background:#fffdf8;margin-bottom:10px;overflow:hidden}summary{cursor:pointer;padding:11px 12px;font-weight:900;color:#394139}details>div{padding:0 12px 12px}.mini-table{width:100%;border-collapse:collapse;font-size:12px}.mini-table th,.mini-table td{border-bottom:1px solid var(--line);padding:7px;text-align:left;vertical-align:top}.mini-table th{color:var(--muted);font-weight:900;background:#fffdf8}
     .quick-toggle{position:fixed;right:18px;bottom:18px;z-index:50;width:58px;height:58px;border-radius:22px;background:var(--accent2);color:#fff;box-shadow:0 18px 36px rgba(76,58,34,.25);font-size:24px;font-weight:900}.quick-pad{position:fixed;right:18px;bottom:86px;z-index:49;width:min(420px,calc(100vw - 28px));background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 22px 60px rgba(43,36,25,.25);overflow:hidden;display:none}.quick-pad.open{display:block}.quick-pad header{padding:12px 14px;background:#fffdf8;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.quick-pad textarea{border:0;border-radius:0;min-height:150px;box-shadow:none}.quick-pad footer{padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);background:#fffdf8}
@@ -56,7 +56,7 @@
 <body data-mobile-panel="edit">
   <div class="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지</h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · Firestore 동기화</p></div></div>
+      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.8</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
       <div class="top-actions">
         <span class="pill"><span id="syncDot" class="dot warn"></span><span id="syncText">연결 준비</span></span>
         <span class="pill hide-mobile" id="countPill">0편</span>
@@ -87,7 +87,7 @@
 
       <section class="panel main-col" id="panelEdit">
         <div class="panel-head"><h2>설교 기록 · 준비</h2><div class="toolbar"><button class="btn small secondary" id="btnDuplicate">복제</button><button class="btn small danger" id="btnDelete">삭제</button></div></div>
-        <div class="tabs" id="mainTabs"><button class="tab active" data-tab="basic">기본정보</button><button class="tab" data-tab="prep">준비질문</button><button class="tab" data-tab="reflect">성찰질문</button><button class="tab" data-tab="manuscript">원고/A4</button><button class="tab" data-tab="tasks">할 일</button><button class="tab" data-tab="feedback">피드백</button></div>
+        <div class="tabs" id="mainTabs"><button class="tab active" data-tab="basic">기본정보</button><button class="tab" data-tab="prep">준비질문</button><button class="tab" data-tab="reflect">성찰질문</button><button class="tab" data-tab="manuscript">원고/A4</button><button class="tab" data-tab="tasks">할 일</button><button class="tab" data-tab="feedback">피드백</button><button class="tab" data-tab="quiz">마지막주 퀴즈</button></div>
         <div class="editor-scroll" id="editor">
           <div class="panel-body view active" data-view="basic">
             <div class="grid2">
@@ -101,7 +101,7 @@
             <div class="field"><label>원포인트 / 한 문장 메시지 <span class="info-dot" data-info="청중이 설교 후 붙잡고 돌아갈 한 문장입니다. 설교 전체를 이 한 문장에 모읍니다.">!</span></label><textarea id="onePointInput" placeholder="청중이 설교 후 붙잡고 돌아갈 한 문장"></textarea></div>
             <div class="field"><label>설교 목적 <span class="info-dot" data-info="청중이 무엇을 알고, 느끼고, 결단하기 원하는지 적습니다.">!</span></label><textarea id="purposeInput" placeholder="청중이 무엇을 알고, 느끼고, 결단하기 원하는가?"></textarea></div>
             <div class="field"><label>본문 관찰 / 해석 메모 <span class="info-dot" data-info="본문 흐름, 반복어, 배경, 신학적 핵심, 해석상 주의할 점을 적습니다.">!</span></label><textarea id="textNoteInput" placeholder="본문 흐름, 반복되는 단어, 당시 배경, 신학적 핵심 등을 적어두세요."></textarea></div>
-            <div class="field"><label>요약 / 성찰 <span class="info-dot" data-info="설교 후 기억할 점, 아쉬운 점, 다음 설교에 반영할 점을 적습니다.">!</span></label><textarea id="summaryInput" placeholder="설교 후 기억할 점, 아쉬운 점, 다음 설교에 반영할 점"></textarea></div>
+            <div class="field"><label>설교 후 피드백 <span class="info-dot" data-info="설교 후 기억할 점, 아쉬운 점, 다음 설교에 반영할 점을 적습니다. 이 내용은 피드백 탭에도 자동 반영됩니다.">!</span></label><textarea id="summaryInput" placeholder="설교 후 기억할 점, 아쉬운 점, 다음 설교에 반영할 점"></textarea></div>
           </div>
 
           <div class="panel-body view" data-view="prep">
@@ -151,6 +151,21 @@
             <div class="section"><div class="section-title">설교 피드백 기록</div><div class="grid2"><select id="feedbackCategory"><option>전달력</option><option>본문이해</option><option>구조</option><option>예화</option><option>적용</option><option>시간관리</option><option>청중반응</option><option>수어통역 고려</option><option>기타</option></select><input id="feedbackTopic" placeholder="주제: 예) 도입부, 결론, 적용 질문" /></div><div class="grid2" style="margin-top:8px"><input id="feedbackSource" placeholder="출처: 본인, 배우자, 청중, 동역자" /><select id="feedbackStatus"><option>검토중</option><option>반영예정</option><option>반영완료</option><option>보류</option></select></div><textarea id="feedbackText" placeholder="받은 피드백 또는 스스로 느낀 점"></textarea><textarea id="feedbackAction" placeholder="이 피드백을 바탕으로 다음 설교에서 바꿔볼 점"></textarea><div class="toolbar right" style="margin-top:8px"><button class="btn" id="btnAddFeedback">피드백 추가</button></div></div>
             <div class="inline-search"><input id="feedbackSearch" placeholder="현재 설교 피드백 검색" /></div>
             <div id="feedbackList"></div>
+          </div>
+
+          <div class="panel-body view" data-view="quiz">
+            <div class="section">
+              <div class="section-title">마지막주 퀴즈 기록 <span class="hint">PPT에 넣을 질문 데이터를 일지에서 관리합니다.</span></div>
+              <div class="grid3"><div class="field"><label>퀴즈 날짜</label><input id="quizDate" type="date" /></div><div class="field"><label>대상</label><select id="quizTarget"><option>유치부</option><option>유년부</option><option>초등부</option><option>전체</option><option>기타</option></select></div><div class="field"><label>형식</label><select id="quizFormat"><option>OX</option><option>객관식</option><option>초성</option><option>주관식</option><option>빈칸</option><option>그림퀴즈</option><option>넌센스</option></select></div></div>
+              <div class="field"><label>문제</label><textarea id="quizQuestion" placeholder="예: 하나님께서 애굽에 내리신 재앙 중 첫 번째 재앙은 무엇일까요?"></textarea></div>
+              <div class="grid2"><div class="field"><label>보기 / 힌트</label><textarea id="quizOptions" placeholder="객관식 보기, 초성 힌트, OX 설명 등을 적어두세요."></textarea></div><div class="field"><label>정답</label><textarea id="quizAnswer" placeholder="정답 또는 해설"></textarea></div></div>
+              <div class="field"><label>퀴즈 피드백</label><textarea id="quizFeedback" placeholder="아이들이 어려워했던 점, 다음에는 바꿀 점, PPT에서 보완할 점"></textarea></div>
+              <div class="field"><label>PPT 메모</label><textarea id="quizPptNote" placeholder="PPT에 넣을 문구, 그림 아이디어, 애니메이션 순서 등"></textarea></div>
+              <div class="toolbar right"><button class="btn secondary" id="btnCopyQuizPpt">PPT용 텍스트 복사</button><button class="btn secondary" id="btnDownloadQuizImage">16:9 이미지 저장</button><button class="btn" id="btnAddQuiz">퀴즈 추가</button></div>
+            </div>
+            <div class="inline-search"><input id="quizSearch" placeholder="퀴즈 검색: 날짜, 대상, 형식, 문제, 정답" /><select id="quizTargetFilter"><option value="">전체 대상</option><option>유치부</option><option>유년부</option><option>초등부</option><option>전체</option><option>기타</option></select></div>
+            <div id="quizList"></div>
+            <details open><summary>PPT 연동 도움말</summary><div class="hint"><p><b>PPT용 텍스트 복사</b>는 문제·보기·정답·피드백을 슬라이드에 붙여넣기 좋게 정리합니다.</p><p><b>16:9 이미지 저장</b>은 현재 입력창의 문제를 1280×720 PNG로 저장합니다. PPT에 그림으로 바로 삽입할 수 있습니다.</p></div></details>
           </div>
         </div>
       </section>
@@ -256,6 +271,7 @@ service cloud.firestore {
       reflectionSearch:$("reflectionSearch"), reflectionAskPanel:$("reflectionAskPanel"), reflectionAskInput:$("reflectionAskInput"), reflectionSort:$("reflectionSort"), reflectionList:$("reflectionList"), customReflectionQuestion:$("customReflectionQuestion"), reflectionBoxList:$("reflectionBoxList"), manuscriptInput:$("manuscriptInput"), previewTitle:$("previewTitle"), previewMeta:$("previewMeta"), previewContent:$("previewContent"), wordCount:$("wordCount"),
       todoText:$("todoText"), todoDue:$("todoDue"), todoType:$("todoType"), todoImportant:$("todoImportant"), todoSearch:$("todoSearch"), todoList:$("todoList"),
       feedbackCategory:$("feedbackCategory"), feedbackTopic:$("feedbackTopic"), feedbackSource:$("feedbackSource"), feedbackStatus:$("feedbackStatus"), feedbackText:$("feedbackText"), feedbackAction:$("feedbackAction"), feedbackSearch:$("feedbackSearch"), feedbackList:$("feedbackList"), globalFeedbackSearch:$("globalFeedbackSearch"), globalFeedbackFilter:$("globalFeedbackFilter"), globalFeedbackBoard:$("globalFeedbackBoard"),
+      quizDate:$("quizDate"), quizTarget:$("quizTarget"), quizFormat:$("quizFormat"), quizQuestion:$("quizQuestion"), quizOptions:$("quizOptions"), quizAnswer:$("quizAnswer"), quizFeedback:$("quizFeedback"), quizPptNote:$("quizPptNote"), quizSearch:$("quizSearch"), quizTargetFilter:$("quizTargetFilter"), quizList:$("quizList"),
       quickPad:$("quickPad"), quickMemo:$("quickMemo"), printSheet:$("printSheet"), importFile:$("importFile"), updateModal:$("updateModal"), updateNotes:$("updateNotes"), updateSavedAt:$("updateSavedAt"), updatePreview:$("updatePreview"), updateHistoryList:$("updateHistoryList"), updateHistoryCount:$("updateHistoryCount"), helpModal:$("helpModal"), copyToast:$("copyToast")
     };
 
@@ -270,6 +286,8 @@ service cloud.firestore {
       bindEvents();
       if(!state.currentId || !state.sermons[state.currentId]) state.currentId = sortedSermons()[0]?.id || null;
       renderAll();
+      if(els.todoDue) els.todoDue.value=nextSunday();
+      if(els.quizDate) els.quizDate.value=current()?.sermonDate || nextSunday();
       applyStructureGuide();
       initFirebase();
     }
@@ -312,6 +330,9 @@ service cloud.firestore {
       $("btnCopyPreview").addEventListener("click", copyPreview);
       $("btnAddTodo").addEventListener("click", addTodoFromForm);
       $("btnAddFeedback").addEventListener("click", addFeedbackFromForm);
+      $("btnAddQuiz").addEventListener("click", addQuizFromForm);
+      $("btnCopyQuizPpt").addEventListener("click", copyQuizPptText);
+      $("btnDownloadQuizImage").addEventListener("click", downloadQuizImage);
       $("btnAddReflectionQuestion").addEventListener("click", addCustomReflectionQuestion);
       $("quickToggle").addEventListener("click", toggleQuickMemo);
       $("quickClose").addEventListener("click", () => els.quickPad.classList.remove("open"));
@@ -340,6 +361,8 @@ service cloud.firestore {
       els.reflectionSort.addEventListener("change", renderReflectionQuestions);
       els.todoSearch.addEventListener("input", renderTodos);
       els.feedbackSearch.addEventListener("input", renderFeedbacks);
+      els.quizSearch.addEventListener("input", renderQuizzes);
+      els.quizTargetFilter.addEventListener("change", renderQuizzes);
       els.globalFeedbackSearch.addEventListener("input", renderGlobalFeedback);
       els.globalFeedbackFilter.addEventListener("change", renderGlobalFeedback);
       document.querySelectorAll("#mainTabs .tab").forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)));
@@ -423,7 +446,7 @@ service cloud.firestore {
 
     function defaultSermon(){
       const date=nextSunday();
-      const s={ id:uid(), localOnly:true, sermonDate:date, dateDisplay:formatDate(date), title:"", passage:"", passageUrl:"", audience:"주일학교예배", keywords:"", theme:"", structure:"서론-본론-결론", onePoint:"", purpose:"", textNote:"", summary:"", prepQuestions:[], prepAnswers:{}, reflectionQuestions:[], reflectionAnswers:{}, removedPrepQuestionIds:[], removedReflectionQuestionIds:[], manuscript:"", todos:[], feedbacks:[], createdAtClient:new Date().toISOString(), updatedAtClient:new Date().toISOString() };
+      const s={ id:uid(), localOnly:true, sermonDate:date, dateDisplay:formatDate(date), title:"", passage:"", passageUrl:"", audience:"주일학교예배", keywords:"", theme:"", structure:"서론-본론-결론", onePoint:"", purpose:"", textNote:"", summary:"", prepQuestions:[], prepAnswers:{}, reflectionQuestions:[], reflectionAnswers:{}, removedPrepQuestionIds:[], removedReflectionQuestionIds:[], manuscript:"", todos:[], feedbacks:[], quizzes:[], createdAtClient:new Date().toISOString(), updatedAtClient:new Date().toISOString() };
       resetPrepQuestionData(s);
       resetReflectionQuestionData(s);
       return s;
@@ -436,13 +459,14 @@ service cloud.firestore {
       n.removedReflectionQuestionIds = Array.isArray(n.removedReflectionQuestionIds) ? n.removedReflectionQuestionIds : [];
       n.todos = Array.isArray(n.todos) ? n.todos : [];
       n.feedbacks = Array.isArray(n.feedbacks) ? n.feedbacks : [];
+      n.quizzes = Array.isArray(n.quizzes) ? n.quizzes : [];
       if(!Array.isArray(n.prepQuestions) || !n.prepQuestions.length) resetPrepQuestionData(n, false);
       if(!Array.isArray(n.reflectionQuestions) || !n.reflectionQuestions.length) resetReflectionQuestionData(n, false);
       stampQuestionList(n.prepQuestions);
       stampQuestionList(n.reflectionQuestions);
       return n;
     }
-    function hasSermonContent(s){ if(!s) return false; const fields=[s.title,s.passage,s.passageUrl,s.audience,s.keywords,s.theme,s.onePoint,s.purpose,s.textNote,s.summary,s.manuscript]; const hasText=fields.some(v=>String(v||"").trim()); const hasPrep=Object.values(s.prepAnswers||{}).some(v=>typeof v==="string" ? v.trim() : String(v?.answer||"").trim()); const hasReflect=Object.values(s.reflectionAnswers||{}).some(v=>String(v?.answer||"").trim() || v?.resolved); return hasText || hasPrep || hasReflect || (s.todos||[]).length || (s.feedbacks||[]).length; }
+    function hasSermonContent(s){ if(!s) return false; const fields=[s.title,s.passage,s.passageUrl,s.audience,s.keywords,s.theme,s.onePoint,s.purpose,s.textNote,s.summary,s.manuscript]; const hasText=fields.some(v=>String(v||"").trim()); const hasPrep=Object.values(s.prepAnswers||{}).some(v=>typeof v==="string" ? v.trim() : String(v?.answer||"").trim()); const hasReflect=Object.values(s.reflectionAnswers||{}).some(v=>String(v?.answer||"").trim() || v?.resolved); return hasText || hasPrep || hasReflect || (s.todos||[]).length || (s.feedbacks||[]).length || (s.quizzes||[]).length; }
     function sermonsArray(includeCurrentDraft=false){ return Object.values(state.sermons).filter(s => hasSermonContent(s) || (includeCurrentDraft && s.id===state.currentId)); }
     function sortedSermons(){ return sortArray(sermonsArray(false), "dateDesc"); }
     function current(){ return state.sermons[state.currentId] || null; }
@@ -476,12 +500,12 @@ service cloud.firestore {
     function collectCurrent(){
       const cur=currentOrCreate();
       cur.sermonDate=els.sermonDate.value || nextSunday(); cur.dateDisplay=formatDate(cur.sermonDate); cur.structure=els.structureSelect.value || "서론-본론-결론"; cur.title=els.titleInput.value.trim(); cur.passage=els.passageInput.value.trim(); cur.passageUrl=els.passageUrlInput.value.trim(); cur.audience=els.audienceInput.value.trim(); cur.keywords=els.keywordsInput.value.trim(); cur.theme=els.themeInput.value.trim(); cur.onePoint=els.onePointInput.value.trim(); cur.purpose=els.purposeInput.value.trim(); cur.textNote=els.textNoteInput.value.trim(); cur.summary=els.summaryInput.value.trim(); cur.manuscript=els.manuscriptInput.value;
-      cur.prepAnswers=collectPrepAnswers(cur); cur.reflectionAnswers=collectReflectionAnswers(cur); cur.updatedAtClient=new Date().toISOString(); cur.localOnly=!hasSermonContent(cur); state.sermons[cur.id]=cur; return cur;
+      cur.prepAnswers=collectPrepAnswers(cur); cur.reflectionAnswers=collectReflectionAnswers(cur); syncPostSermonFeedback(cur); cur.updatedAtClient=new Date().toISOString(); cur.localOnly=!hasSermonContent(cur); state.sermons[cur.id]=cur; return cur;
     }
     function collectPrepAnswers(cur=current()){ const old={...(cur?.prepAnswers||{})}; document.querySelectorAll("[data-prep-key]").forEach(t => { old[t.dataset.prepKey]=t.value; }); return old; }
     function collectReflectionAnswers(cur=current()){ const old={...(cur?.reflectionAnswers||{})}; document.querySelectorAll("[data-reflection-key]").forEach(card => { const key=card.dataset.reflectionKey; old[key]=old[key]||{}; old[key].answer=card.querySelector("textarea")?.value || ""; }); return old; }
     function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>saveCurrent({silent:true}),650); }
-    async function saveCurrent(opts={}){ const cur=collectCurrent(); saveLocal(); renderPreview(); renderStats(); renderList(); if(Date.now() > typingRenderHoldUntil) renderGlobalFeedback(); if(!opts.silent) setStatus("저장 중","warn"); await saveSermon(cur); if(!opts.silent) setStatus(state.ready?"저장 완료":"로컬 저장 완료", state.ready?"ok":"warn"); }
+    async function saveCurrent(opts={}){ const cur=collectCurrent(); saveLocal(); renderPreview(); renderStats(); renderList(); renderFeedbacks(); if(Date.now() > typingRenderHoldUntil) renderGlobalFeedback(); if(!opts.silent) setStatus("저장 중","warn"); await saveSermon(cur); if(!opts.silent) setStatus(state.ready?"저장 완료":"로컬 저장 완료", state.ready?"ok":"warn"); }
     async function saveSermon(s){ if(!s?.id || state.deletedIds.has(s.id)) return; if(!hasSermonContent(s)) return; if(!state.ready || !db) return; try{ await setDoc(doc(db,"rooms",state.room,"sermons",s.id), {...s, localOnly:false, updatedAt:serverTimestamp()}, {merge:true}); s.localOnly=false; saveLocal(); }catch(err){ console.error(err); setStatus(firestoreErrorMessage(err),"bad"); } }
     function persistSermon(sermon, opts={render:true, remote:true}){ if(!sermon?.id || state.deletedIds.has(sermon.id)) return; sermon.updatedAtClient=new Date().toISOString(); sermon.localOnly=!hasSermonContent(sermon); state.sermons[sermon.id]=sermon; saveLocal(); if(opts.remote) saveSermon(sermon); if(opts.render) renderEditorPieces(); }
     function debounceRemoteSave(sermon){ if(!sermon?.id) return; typingRenderHoldUntil = Date.now()+2000; clearTimeout(remoteSaveTimers.get(sermon.id)); remoteSaveTimers.set(sermon.id, setTimeout(()=>{ remoteSaveTimers.delete(sermon.id); saveSermon(sermon); }, 900)); saveLocal(); }
@@ -494,12 +518,12 @@ service cloud.firestore {
     }
     function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify({sermons:state.sermons,currentId:state.currentId,room:state.room,updateNotes:state.updateNotes,updateSavedAt:state.updateSavedAt,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,deletedIds:[...state.deletedIds],savedAt:new Date().toISOString()})); }
     function renderAll(skipEditor=false){ renderStats(); renderList(); if(Date.now() > typingRenderHoldUntil) renderGlobalFeedback(); renderUpdatePreview(); renderReflectionBox(); if(!skipEditor) renderEditor(); else renderPreview(); els.roomInput.value=state.room; }
-    function renderEditorPieces(){ renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderGlobalFeedback(); renderStats(); renderList(); renderPreview(); }
+    function renderEditorPieces(){ renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); renderGlobalFeedback(); renderStats(); renderList(); renderPreview(); }
 
-    function renderEditor(){ const cur=current(); if(!cur){ clearEditor(); return; } ensurePrepQuestions(cur); ensureReflectionQuestions(cur); els.sermonDate.value=cur.sermonDate || nextSunday(); els.sermonDateText.value=formatDate(els.sermonDate.value); els.structureSelect.value=cur.structure || "서론-본론-결론"; els.titleInput.value=cur.title||""; els.passageInput.value=cur.passage||""; els.passageUrlInput.value=cur.passageUrl||""; els.audienceInput.value=cur.audience||"주일학교예배"; els.keywordsInput.value=cur.keywords||""; els.themeInput.value=cur.theme||""; els.onePointInput.value=cur.onePoint||""; els.purposeInput.value=cur.purpose||""; els.textNoteInput.value=cur.textNote||""; els.summaryInput.value=cur.summary||""; els.manuscriptInput.value=cur.manuscript||""; applyStructureGuide(); refreshBasicPlaceholders(); renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderPreview(); renderList(); }
-    function clearEditor(){ [els.titleInput,els.passageInput,els.passageUrlInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput].forEach(e=>e.value=""); els.audienceInput.value="주일학교예배"; const d=nextSunday(); els.sermonDate.value=d; els.sermonDateText.value=formatDate(d); els.questionList.innerHTML=`<div class="empty">새 설교를 누르거나 내용을 입력하면 준비질문을 사용할 수 있습니다.</div>`; els.questionBankList.innerHTML=""; els.reflectionList.innerHTML=""; els.todoList.innerHTML=""; els.feedbackList.innerHTML=""; renderPreview(); }
+    function renderEditor(){ const cur=current(); if(!cur){ clearEditor(); return; } ensurePrepQuestions(cur); ensureReflectionQuestions(cur); els.sermonDate.value=cur.sermonDate || nextSunday(); els.sermonDateText.value=formatDate(els.sermonDate.value); els.structureSelect.value=cur.structure || "서론-본론-결론"; els.titleInput.value=cur.title||""; els.passageInput.value=cur.passage||""; els.passageUrlInput.value=cur.passageUrl||""; els.audienceInput.value=cur.audience||"주일학교예배"; els.keywordsInput.value=cur.keywords||""; els.themeInput.value=cur.theme||""; els.onePointInput.value=cur.onePoint||""; els.purposeInput.value=cur.purpose||""; els.textNoteInput.value=cur.textNote||""; els.summaryInput.value=cur.summary||""; els.manuscriptInput.value=cur.manuscript||""; applyStructureGuide(); refreshBasicPlaceholders(); renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); if(els.todoDue && !els.todoDue.value) els.todoDue.value=nextSunday(); if(els.quizDate && !els.quizDate.value) els.quizDate.value=cur.sermonDate || nextSunday(); renderPreview(); renderList(); }
+    function clearEditor(){ [els.titleInput,els.passageInput,els.passageUrlInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput].forEach(e=>e.value=""); els.audienceInput.value="주일학교예배"; const d=nextSunday(); els.sermonDate.value=d; els.sermonDateText.value=formatDate(d); els.questionList.innerHTML=`<div class="empty">새 설교를 누르거나 내용을 입력하면 준비질문을 사용할 수 있습니다.</div>`; els.questionBankList.innerHTML=""; els.reflectionList.innerHTML=""; els.todoList.innerHTML=""; els.feedbackList.innerHTML=""; if(els.quizList) els.quizList.innerHTML=""; if(els.todoDue) els.todoDue.value=nextSunday(); if(els.quizDate) els.quizDate.value=nextSunday(); renderPreview(); }
     function renderList(){ const q=(els.searchInput.value||"").toLowerCase().trim(); const fs=els.filterStructure.value; let arr=sermonsArray(true); if(q) arr=arr.filter(s=>[s.title,s.passage,s.keywords,s.theme,s.onePoint,s.summary,s.audience].join(" ").toLowerCase().includes(q)); if(fs) arr=arr.filter(s=>(s.structure||"")===fs); arr=sortArray(arr,els.sortMode.value); els.sermonList.innerHTML=arr.length?"":`<div class="empty">검색 결과가 없습니다.<br>+ 새 설교를 눌러 기록을 시작하세요.</div>`; arr.forEach(s=>{ const item=document.createElement("button"); item.className="sermon-item"+(s.id===state.currentId?" active":""); item.innerHTML=`<div class="sermon-date">${escapeHtml(formatDate(s.sermonDate||nextSunday()))}</div><div style="min-width:0;flex:1;text-align:left"><div class="sermon-title">${escapeHtml(s.title||"제목 없음")}</div><div class="sermon-meta">${escapeHtml(s.passage||"본문 미입력")} · ${escapeHtml(s.structure||"형식 미지정")}</div><div class="tagline">${tags(s.keywords).slice(0,4).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div></div>`; item.addEventListener("click",()=>{ if(current()) saveCurrent({silent:true}); state.currentId=s.id; saveLocal(); renderEditor(); showTab("basic"); setMobilePanel("edit"); }); els.sermonList.appendChild(item); }); els.listCount.textContent=arr.length; els.countPill.textContent=`${sermonsArray(false).length}편 · ${state.room}`; }
-    function renderStats(){ const arr=sermonsArray(false); const feedbackCount=arr.reduce((n,s)=>n+(s.feedbacks?.length||0),0); const todoCount=arr.reduce((n,s)=>n+(s.todos||[]).filter(t=>!t.done).length,0); const manuscriptCount=arr.filter(s=>(s.manuscript||"").trim()).length; els.statsBox.innerHTML=`<div class="stat"><b>${arr.length}</b><span>설교 기록</span></div><div class="stat"><b>${feedbackCount}</b><span>피드백</span></div><div class="stat"><b>${todoCount}</b><span>미완료 할 일</span></div><div class="stat"><b>${manuscriptCount}</b><span>원고 작성</span></div>`; }
+    function renderStats(){ const arr=sermonsArray(false); const feedbackCount=arr.reduce((n,s)=>n+(s.feedbacks?.length||0),0); const todoCount=arr.reduce((n,s)=>n+(s.todos||[]).filter(t=>!t.done).length,0); const manuscriptCount=arr.filter(s=>(s.manuscript||"").trim()).length; const quizCount=arr.reduce((n,s)=>n+(s.quizzes?.length||0),0); els.statsBox.innerHTML=`<div class="stat"><b>${arr.length}</b><span>설교 기록</span></div><div class="stat"><b>${feedbackCount}</b><span>피드백</span></div><div class="stat"><b>${todoCount}</b><span>미완료 할 일</span></div><div class="stat"><b>${quizCount}</b><span>퀴즈</span></div>`; }
     function sortArray(arr,mode){ return [...arr].sort((a,b)=>{ if(mode==="dateAsc") return String(a.sermonDate||"").localeCompare(String(b.sermonDate||"")); if(mode==="updatedDesc") return String(b.updatedAtClient||"").localeCompare(String(a.updatedAtClient||"")); if(mode==="titleAsc") return String(a.title||"").localeCompare(String(b.title||""),"ko"); return String(b.sermonDate||"").localeCompare(String(a.sermonDate||"")); }); }
 
     function makeQuestion(text, category="기본"){ return {id:"q_"+hashText(text), text, category, pinned:false, order:0, createdAt:"", updatedAt:""}; }
@@ -619,8 +643,8 @@ service cloud.firestore {
     async function copyPreview(){ const cur=collectCurrent(); const text=[cur.title||"제목 없음", `날짜: ${formatDate(cur.sermonDate||nextSunday())}`, `본문: ${cur.passage||"본문 미입력"}`, `형식: ${cur.structure||""}`, cur.theme?`주제: ${cur.theme}`:"", cur.onePoint?`핵심: ${cur.onePoint}`:"", "", cur.manuscript||"원고 미작성"].filter(v=>v!=="").join("\n"); await copyTextWithToast(text,"전체 미리보기를 복사했습니다"); }
     async function printCurrent(){ clearTimeout(saveTimer); if(!current()) return alert("인쇄할 설교가 없습니다."); await saveCurrent({silent:true}); const cur=current(); if(!cur) return alert("인쇄할 설교가 없습니다."); els.printSheet.innerHTML=`<h1>${escapeHtml(cur.title||"제목 없음")}</h1><div class="print-meta">날짜: ${escapeHtml(formatDate(cur.sermonDate||nextSunday()))}<br>본문: ${escapeHtml(cur.passage||"본문 미입력")}<br>형식: ${escapeHtml(cur.structure||"")}<br>주제: ${escapeHtml(cur.theme||"")}<br>핵심: ${escapeHtml(cur.onePoint||"")}</div><div class="print-content">${escapeHtml(cur.manuscript||"")}</div><div class="print-footer">설교일지 · ${escapeHtml(state.room)}</div>`; requestAnimationFrame(()=>setTimeout(()=>window.print(),80)); }
 
-    function addTodoFromForm(){ const text=els.todoText.value.trim(); if(!text) return; addTodo(text,els.todoDue.value,els.todoType.value,els.todoImportant.checked); els.todoText.value=""; els.todoDue.value=""; els.todoImportant.checked=false; showTab("tasks"); }
-    function addTodo(text,due="",type="준비",important=false){ const cur=currentOrCreate(); cur.todos=cur.todos||[]; cur.todos.unshift({id:uid(),text,due,type,important:!!important,done:false,createdAt:new Date().toISOString(),doneAt:""}); persistSermon(cur); }
+    function addTodoFromForm(){ const text=els.todoText.value.trim(); if(!text) return; addTodo(text,els.todoDue.value || nextSunday(),els.todoType.value,els.todoImportant.checked); els.todoText.value=""; els.todoDue.value=nextSunday(); els.todoImportant.checked=false; showTab("tasks"); }
+    function addTodo(text,due="",type="준비",important=false){ if(!due) due=nextSunday(); const cur=currentOrCreate(); cur.todos=cur.todos||[]; cur.todos.unshift({id:uid(),text,due,type,important:!!important,done:false,createdAt:new Date().toISOString(),doneAt:""}); persistSermon(cur); }
     function renderTodos(){
       const cur=current(); if(!cur){ els.todoList.innerHTML=""; return; }
       const q=(els.todoSearch.value||"").toLowerCase().trim();
@@ -645,11 +669,79 @@ service cloud.firestore {
       });
     }
 
+    function syncPostSermonFeedback(cur){
+      cur.feedbacks = Array.isArray(cur.feedbacks) ? cur.feedbacks : [];
+      const text = String(cur.summary||"").trim();
+      const idx = cur.feedbacks.findIndex(f=>f.systemType==="postSermonFeedback");
+      if(!text){ if(idx>=0) cur.feedbacks.splice(idx,1); return; }
+      const item = idx>=0 ? cur.feedbacks[idx] : {id:"__post_sermon_feedback", createdAt:new Date().toISOString(), reflection:""};
+      Object.assign(item,{systemType:"postSermonFeedback", category:"설교 후 피드백", topic:"기본정보 설교 후 피드백", source:"본인", status:"검토중", text, action:"", updatedAtClient:new Date().toISOString()});
+      if(idx>=0) cur.feedbacks[idx]=item; else cur.feedbacks.unshift(item);
+    }
+
     function addFeedbackFromForm(){ const text=els.feedbackText.value.trim(); if(!text) return; addFeedback({category:els.feedbackCategory.value,topic:els.feedbackTopic.value.trim()||els.feedbackCategory.value,source:els.feedbackSource.value.trim(),status:els.feedbackStatus.value,text,action:els.feedbackAction.value.trim(),reflection:""}); els.feedbackText.value=""; els.feedbackAction.value=""; els.feedbackTopic.value=""; showTab("feedback"); }
     function addFeedback(data){ const cur=currentOrCreate(); cur.feedbacks=cur.feedbacks||[]; cur.feedbacks.unshift({id:uid(),createdAt:new Date().toISOString(),...data}); persistSermon(cur); }
     function renderFeedbacks(){ const cur=current(); if(!cur){ els.feedbackList.innerHTML=""; return; } const q=(els.feedbackSearch.value||"").toLowerCase().trim(); const list=(cur.feedbacks||[]).filter(f=>!q || [f.category,f.topic,f.source,f.status,f.text,f.action,f.reflection].join(" ").toLowerCase().includes(q)); els.feedbackList.innerHTML=list.length?"":`<div class="empty">피드백이 없습니다.</div>`; list.forEach(f=>els.feedbackList.appendChild(feedbackCard(f,cur,false))); }
     function feedbackCard(f,sermon,compact=true){ const card=document.createElement("div"); card.className="feedback-card"; card.innerHTML=`<div class="feedback-top"><div><div class="feedback-title">${escapeHtml(f.topic||f.category||"피드백")}</div><div class="tagline"><span class="chip">${escapeHtml(f.category||"기타")}</span><span class="chip">${escapeHtml(f.status||"검토중")}</span>${f.source?`<span class="chip">${escapeHtml(f.source)}</span>`:""}</div></div><button class="btn small secondary" data-del>삭제</button></div><div class="feedback-text">${escapeHtml(f.text||"")}</div>${f.action?`<div class="feedback-reflect"><label>다음 반영</label><div class="feedback-text">${escapeHtml(f.action)}</div></div>`:""}${compact?`<div class="hint" style="margin-top:8px">${escapeHtml(formatDate(sermon.sermonDate||nextSunday()))} · ${escapeHtml(sermon.title||"제목 없음")}</div>`:""}<div class="feedback-reflect"><label>피드백에 대한 피드백 / 실제 반영 결과</label><textarea data-reflect placeholder="반영해보니 어땠는지, 다음에 더 조정할 점을 적어보세요.">${escapeHtml(f.reflection||"")}</textarea></div>`; card.querySelector("[data-reflect]").addEventListener("input",e=>{ f.reflection=e.target.value; sermon.updatedAtClient=new Date().toISOString(); state.sermons[sermon.id]=sermon; debounceRemoteSave(sermon); }); card.querySelector("[data-del]").addEventListener("click",()=>{ if(!confirm("이 피드백을 삭제할까요?")) return; sermon.feedbacks=(sermon.feedbacks||[]).filter(x=>x.id!==f.id); persistSermon(sermon); }); return card; }
     function renderGlobalFeedback(){ const filter=els.globalFeedbackFilter.value; const query=(els.globalFeedbackSearch.value||"").toLowerCase().trim(); const all=[]; sermonsArray(false).forEach(s=>(s.feedbacks||[]).forEach(f=>{ const hay=[f.category,f.topic,f.source,f.status,f.text,f.action,f.reflection,s.title,s.passage].join(" ").toLowerCase(); if((!filter||f.category===filter) && (!query||hay.includes(query))) all.push({sermon:s,feedback:f}); })); all.sort((a,b)=>String(b.feedback.createdAt||"").localeCompare(String(a.feedback.createdAt||""))); if(!all.length){ els.globalFeedbackBoard.innerHTML=`<div class="empty">모아볼 피드백이 없습니다.</div>`; return; } const groups={}; all.forEach(x=>{ const key=x.feedback.topic||x.feedback.category||"기타"; (groups[key] ||= []).push(x); }); els.globalFeedbackBoard.innerHTML=""; Object.entries(groups).forEach(([topic,items])=>{ const wrap=document.createElement("details"); wrap.open=true; wrap.innerHTML=`<summary>${escapeHtml(topic)} <span class="hint">${items.length}개</span></summary><div></div>`; const box=wrap.querySelector("div"); items.forEach(({sermon,feedback})=>box.appendChild(feedbackCard(feedback,sermon,true))); els.globalFeedbackBoard.appendChild(wrap); }); }
+
+    function quizFormData(){
+      return {
+        date: els.quizDate?.value || nextSunday(),
+        target: els.quizTarget?.value || "유치부",
+        format: els.quizFormat?.value || "OX",
+        question: els.quizQuestion?.value.trim() || "",
+        options: els.quizOptions?.value.trim() || "",
+        answer: els.quizAnswer?.value.trim() || "",
+        feedback: els.quizFeedback?.value.trim() || "",
+        pptNote: els.quizPptNote?.value.trim() || ""
+      };
+    }
+    function clearQuizForm(){ if(els.quizQuestion) els.quizQuestion.value=""; if(els.quizOptions) els.quizOptions.value=""; if(els.quizAnswer) els.quizAnswer.value=""; if(els.quizFeedback) els.quizFeedback.value=""; if(els.quizPptNote) els.quizPptNote.value=""; if(els.quizDate) els.quizDate.value=current()?.sermonDate || nextSunday(); }
+    function addQuizFromForm(){ const data=quizFormData(); if(!data.question) return alert("퀴즈 문제를 입력해주세요."); const cur=currentOrCreate(); cur.quizzes=Array.isArray(cur.quizzes)?cur.quizzes:[]; cur.quizzes.unshift({id:uid(), createdAt:new Date().toISOString(), updatedAtClient:new Date().toISOString(), ...data}); persistSermon(cur); clearQuizForm(); showTab("quiz"); }
+    function renderQuizzes(){
+      if(!els.quizList) return;
+      const cur=current(); if(!cur){ els.quizList.innerHTML=""; return; }
+      cur.quizzes=Array.isArray(cur.quizzes)?cur.quizzes:[];
+      if(els.quizDate && !els.quizDate.value) els.quizDate.value=cur.sermonDate || nextSunday();
+      const q=(els.quizSearch?.value||"").toLowerCase().trim();
+      const target=els.quizTargetFilter?.value||"";
+      let list=[...cur.quizzes].filter(x=>{
+        const hay=[x.date,x.target,x.format,x.question,x.options,x.answer,x.feedback,x.pptNote].join(" ").toLowerCase();
+        return (!target || x.target===target) && (!q || hay.includes(q));
+      });
+      list.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")) || String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
+      els.quizList.innerHTML=list.length?"":`<div class="empty">기록된 퀴즈가 없습니다.</div>`;
+      list.forEach((z,idx)=>{
+        const card=document.createElement("div"); card.className="quiz-card";
+        card.innerHTML=`<div class="quiz-badges"><span class="chip">${escapeHtml(formatDate(z.date||nextSunday()))}</span><span class="chip">${escapeHtml(z.target||"")}</span><span class="chip">${escapeHtml(z.format||"")}</span></div><h4>Q${idx+1}. ${escapeHtml(z.question||"문제 없음")}</h4>${z.options?`<div class="quiz-options"><b>보기/힌트</b><br>${escapeHtml(z.options)}</div>`:""}${z.answer?`<div class="quiz-answer"><b>정답</b><br>${escapeHtml(z.answer)}</div>`:""}${z.feedback?`<div class="quiz-feedback"><b>피드백</b><br>${escapeHtml(z.feedback)}</div>`:""}${z.pptNote?`<div class="quiz-options"><b>PPT 메모</b><br>${escapeHtml(z.pptNote)}</div>`:""}<div class="toolbar compact" style="margin-top:10px"><button class="btn small secondary" data-copy>복사</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-img>이미지</button><button class="btn small secondary" data-del>삭제</button></div>`;
+        card.querySelector("[data-copy]").addEventListener("click",()=>copyTextWithToast(formatQuizForPpt(z),"퀴즈를 복사했습니다"));
+        card.querySelector("[data-img]").addEventListener("click",()=>downloadQuizImage(z));
+        card.querySelector("[data-del]").addEventListener("click",()=>{ if(!confirm("이 퀴즈를 삭제할까요?")) return; cur.quizzes=cur.quizzes.filter(x=>x.id!==z.id); persistSermon(cur); });
+        card.querySelector("[data-edit]").addEventListener("click",()=>{
+          const question=prompt("문제 수정",z.question||""); if(question===null) return; z.question=question.trim();
+          const answer=prompt("정답/해설 수정",z.answer||""); if(answer!==null) z.answer=answer.trim();
+          const feedback=prompt("피드백 수정",z.feedback||""); if(feedback!==null) z.feedback=feedback.trim();
+          z.updatedAtClient=new Date().toISOString(); persistSermon(cur);
+        });
+        els.quizList.appendChild(card);
+      });
+    }
+    function formatQuizForPpt(z=quizFormData()){
+      return [`[${z.format||"퀴즈"}] ${formatDate(z.date||nextSunday())} · ${z.target||"대상"}`, `문제: ${z.question||""}`, z.options?`보기/힌트:\n${z.options}`:"", z.answer?`정답:\n${z.answer}`:"", z.feedback?`피드백:\n${z.feedback}`:"", z.pptNote?`PPT 메모:\n${z.pptNote}`:""].filter(Boolean).join("\n\n");
+    }
+    function copyQuizPptText(){ const cur=current(); const list=(cur?.quizzes||[]); const text=list.length ? list.map((z,i)=>`#${i+1}\n${formatQuizForPpt(z)}`).join("\n\n---\n\n") : formatQuizForPpt(quizFormData()); copyTextWithToast(text,"PPT용 퀴즈 텍스트를 복사했습니다"); }
+    function downloadQuizImage(item){
+      const z=item || quizFormData(); if(!z.question) return alert("이미지로 만들 문제를 입력하거나 저장된 퀴즈를 선택하세요.");
+      const canvas=document.createElement("canvas"); canvas.width=1280; canvas.height=720; const ctx=canvas.getContext("2d");
+      ctx.fillStyle="#fffdf8"; ctx.fillRect(0,0,1280,720); ctx.fillStyle="#5d6f4f"; ctx.fillRect(0,0,1280,84);
+      ctx.fillStyle="#fff"; ctx.font="bold 34px sans-serif"; ctx.fillText(`${z.target||""} · ${z.format||"퀴즈"}`,60,54);
+      ctx.fillStyle="#1d211f"; ctx.font="bold 54px sans-serif"; wrapCanvasText(ctx,z.question||"",70,170,1140,68,4);
+      ctx.font="32px sans-serif"; ctx.fillStyle="#4d554d"; if(z.options) wrapCanvasText(ctx,z.options,90,460,1100,42,3);
+      ctx.font="bold 26px sans-serif"; ctx.fillStyle="#8a6b3f"; ctx.fillText(formatDate(z.date||nextSunday()),70,660);
+      const a=document.createElement("a"); a.href=canvas.toDataURL("image/png"); a.download=`퀴즈_${z.target||"대상"}_${today()}.png`; a.click();
+    }
+    function wrapCanvasText(ctx,text,x,y,maxWidth,lineHeight,maxLines=5){ const words=String(text||"").replace(/\n/g," \n ").split(/\s+/); let line="", lines=[]; words.forEach(w=>{ if(w==="\n"){ lines.push(line); line=""; return; } const test=line?line+" "+w:w; if(ctx.measureText(test).width>maxWidth && line){ lines.push(line); line=w; } else line=test; }); if(line) lines.push(line); lines.slice(0,maxLines).forEach((ln,i)=>ctx.fillText(ln,x,y+i*lineHeight)); if(lines.length>maxLines) ctx.fillText("…",x,y+maxLines*lineHeight); }
 
     function quickToManuscript(){ const memo=els.quickMemo.value.trim(); if(!memo) return; const cur=currentOrCreate(); els.manuscriptInput.value+=(els.manuscriptInput.value.trim()?"\n\n":"")+`[메모] ${memo}`; cur.manuscript=els.manuscriptInput.value; els.quickMemo.value=""; saveCurrent({silent:true}); renderPreview(); setMobilePanel("manuscript"); }
     function quickToFeedback(){ const memo=els.quickMemo.value.trim(); if(!memo) return; addFeedback({category:"기타",topic:"빠른 메모",source:"본인",status:"검토중",text:memo,action:"",reflection:""}); els.quickMemo.value=""; showTab("feedback"); }
@@ -720,7 +812,7 @@ service cloud.firestore {
       else { (e.shiftKey ? textareas[textareas.length-1] : textareas[0])?.focus(); }
     }
 
-    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:7,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
+    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:8,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
     async function importJson(){ const file=els.importFile.files?.[0]; if(!file) return alert("불러올 JSON 파일을 선택하세요."); try{ const data=JSON.parse(await file.text()); const arr=Array.isArray(data)?data:(data.sermons||[]); if(data.updateNotes){ state.updateNotes=data.updateNotes; } if(Array.isArray(data.updateHistory)) state.updateHistory=data.updateHistory; if(Array.isArray(data.reflectionBox)) state.reflectionBox=mergeQuestionBoxes(state.reflectionBox,data.reflectionBox); if(Array.isArray(data.prepQuestionBox)) state.prepQuestionBox=mergeQuestionBoxes(state.prepQuestionBox,data.prepQuestionBox); await saveSystemDoc(); renderUpdatePreview(); renderReflectionBox(); if(!arr.length) return alert("설교일지 데이터가 없습니다."); for(const item of arr){ const id=item.id||uid(); const s=normalizeSermon({...item,id,localOnly:false,updatedAtClient:new Date().toISOString()}); state.sermons[id]=s; await saveSermon(s); } state.currentId=arr[0].id; saveLocal(); renderAll(); alert("백업을 불러왔습니다."); }catch(e){ console.error(e); alert("JSON 파일을 읽지 못했습니다."); } }
 
     function handleShortcuts(e){
@@ -744,7 +836,7 @@ service cloud.firestore {
       };
       if(actions[combo]){ e.__sermonHandled=true; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation?.(); actions[combo](); }
     }
-    function focusContextSearch(){ const active=document.querySelector(".view.active")?.dataset.view; const panel=document.body.dataset.mobilePanel; const target = panel==="right" ? els.globalFeedbackSearch : active==="prep" ? els.prepSearch : active==="reflect" ? els.reflectionSearch : active==="tasks" ? els.todoSearch : active==="feedback" ? els.feedbackSearch : els.searchInput; target?.focus(); target?.select?.(); }
+    function focusContextSearch(){ const active=document.querySelector(".view.active")?.dataset.view; const panel=document.body.dataset.mobilePanel; const target = panel==="right" ? els.globalFeedbackSearch : active==="prep" ? els.prepSearch : active==="reflect" ? els.reflectionSearch : active==="tasks" ? els.todoSearch : active==="feedback" ? els.feedbackSearch : active==="quiz" ? els.quizSearch : els.searchInput; target?.focus(); target?.select?.(); }
     function isTypingTarget(el){ return el && (["INPUT","TEXTAREA","SELECT"].includes(el.tagName) || el.isContentEditable); }
 
     function today(){ const d=new Date(); return isoDate(d); }
