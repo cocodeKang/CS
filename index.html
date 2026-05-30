@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>설교일지 v1.9 · Firestore 동기화</title>
+  <title>설교일지 v1.10 · Firestore 동기화</title>
   <style>
     :root{
       --bg:#f6f4ef;--paper:#fffdf8;--card:#fff;--ink:#1d211f;--muted:#6f746f;--line:#e2ddd2;
@@ -56,7 +56,7 @@
 <body data-mobile-panel="edit">
   <div class="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.9</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
+      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.10</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
       <div class="top-actions">
         <span class="pill"><span id="syncDot" class="dot warn"></span><span id="syncText">연결 준비</span></span>
         <span class="pill hide-mobile" id="countPill">0편</span>
@@ -164,11 +164,11 @@
               <div class="field"><label>해설</label><textarea id="quizExplanation" placeholder="왜 이 답인지, 아이들에게 설명할 핵심 문장을 적어두세요."></textarea></div>
               <div class="field"><label>퀴즈 피드백</label><textarea id="quizFeedback" placeholder="아이들이 어려워했던 점, 다음에는 바꿀 점, PPT에서 보완할 점"></textarea></div>
               <div class="field"><label>PPT 메모</label><textarea id="quizPptNote" placeholder="PPT에 넣을 문구, 그림 아이디어, 애니메이션 순서 등"></textarea></div>
-              <div class="toolbar right"><button class="btn secondary" id="btnCopyQuizPpt">PPT용 텍스트 복사</button><button class="btn secondary" id="btnDownloadQuizImage">문제 이미지 저장</button><button class="btn secondary" id="btnDownloadQuizAnswerImage">정답 이미지 저장</button><button class="btn" id="btnAddQuiz">퀴즈 추가</button></div>
+              <div class="toolbar right"><button class="btn secondary" id="btnCopyQuizPpt">PPT용 텍스트 복사</button><button class="btn secondary" id="btnCopyQuizQuestionImage">문제 이미지 복사</button><button class="btn secondary" id="btnDownloadQuizImage">문제 이미지 저장</button><button class="btn secondary" id="btnDownloadQuizAnswerImage">정답 이미지 저장</button><button class="btn" id="btnAddQuiz">퀴즈 추가</button></div>
             </div>
             <div class="inline-search"><input id="quizSearch" placeholder="퀴즈 검색: 날짜, 대상, 형식, 문제, 정답" /><select id="quizTargetFilter"><option value="">전체 대상</option><option>유치부</option><option>유년부</option><option>초등부</option><option>전체</option><option>기타</option></select></div>
             <div id="quizList"></div>
-            <details open><summary>PPT 연동 도움말</summary><div class="hint"><p><b>PPT용 텍스트 복사</b>는 문제·보기·정답·피드백을 슬라이드에 붙여넣기 좋게 정리합니다.</p><p><b>16:9 이미지 저장</b>은 현재 입력창의 문제를 1280×720 PNG로 저장합니다. PPT에 그림으로 바로 삽입할 수 있습니다.</p></div></details>
+            <details open><summary>PPT 연동 도움말</summary><div class="hint"><p><b>PPT용 텍스트 복사</b>는 문제·보기·정답·피드백을 슬라이드에 붙여넣기 좋게 정리합니다.</p><p><b>문제 이미지 복사</b>는 현재 작성 중인 문제를 16:9 이미지로 만들어 클립보드에 복사합니다.</p><p><b>16:9 이미지 저장</b>은 현재 입력창에 작성 중인 내용 또는 저장된 퀴즈를 1280×720 PNG로 저장합니다. PPT에 그림으로 바로 삽입할 수 있습니다.</p></div></details>
           </div>
         </div>
       </section>
@@ -212,7 +212,7 @@ service cloud.firestore {
       <div><b>Ctrl+G</b></div><div>GPT 링크 열기</div>
       <div><b>Ctrl+D</b></div><div>네이버 국어사전 열기</div>
       <div><b>Ctrl+H</b></div><div>기본정보 탭으로 이동</div>
-      <div><b>Shift+?</b></div><div>도움말 열기</div>
+      <div><b>Ctrl+?</b></div><div>도움말 열기</div>
       <div><b>Ctrl+Y</b></div><div>Gemini 링크 열기</div>
       <div><b>Ctrl+E</b></div><div>GitHub 편집 링크 열기</div>
     </div>
@@ -336,6 +336,7 @@ service cloud.firestore {
       $("btnAddFeedback").addEventListener("click", addFeedbackFromForm);
       $("btnAddQuiz").addEventListener("click", addQuizFromForm);
       $("btnCopyQuizPpt").addEventListener("click", copyQuizPptText);
+      $("btnCopyQuizQuestionImage").addEventListener("click", () => copyQuizImage(null, "question"));
       $("btnDownloadQuizImage").addEventListener("click", () => downloadQuizImage(null, "question"));
       $("btnDownloadQuizAnswerImage").addEventListener("click", () => downloadQuizImage(null, "answer"));
       els.quizFormat.addEventListener("change", updateQuizFormatUI);
@@ -793,10 +794,11 @@ service cloud.firestore {
       els.quizList.innerHTML=list.length?"":`<div class="empty">기록된 퀴즈가 없습니다.</div>`;
       list.forEach((z,idx)=>{
         const card=document.createElement("div"); card.className="quiz-card"; card.title="클릭하면 이 퀴즈를 입력창으로 불러옵니다.";
-        card.innerHTML=`<div class="quiz-badges"><span class="chip">${escapeHtml(formatDate(z.date||nextSunday()))}</span><span class="chip">${escapeHtml(z.target||"")}</span><span class="chip">${escapeHtml(z.format||"")}</span>${z.passage?`<span class="chip">${escapeHtml(z.passage)}</span>`:""}</div><h4>Q${idx+1}. ${escapeHtml(z.question||"문제 없음")}</h4>${z.options?`<div class="quiz-options"><b>보기/힌트</b><br>${escapeHtml(z.options)}</div>`:""}${z.answer?`<div class="quiz-answer"><b>정답</b><br>${escapeHtml(z.answer)}</div>`:""}${z.explanation?`<div class="quiz-answer"><b>해설</b><br>${escapeHtml(z.explanation)}</div>`:""}${z.feedback?`<div class="quiz-feedback"><b>피드백</b><br>${escapeHtml(z.feedback)}</div>`:""}${z.pptNote?`<div class="quiz-options"><b>PPT 메모</b><br>${escapeHtml(z.pptNote)}</div>`:""}<div class="toolbar compact" style="margin-top:10px"><button class="btn small secondary" data-copy>복사</button><button class="btn small secondary" data-load>불러오기</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-img>문제이미지</button><button class="btn small secondary" data-answer-img>정답이미지</button><button class="btn small secondary" data-del>삭제</button></div>`;
+        card.innerHTML=`<div class="quiz-badges"><span class="chip">${escapeHtml(formatDate(z.date||nextSunday()))}</span><span class="chip">${escapeHtml(z.target||"")}</span><span class="chip">${escapeHtml(z.format||"")}</span>${z.passage?`<span class="chip">${escapeHtml(z.passage)}</span>`:""}</div><h4>Q${idx+1}. ${escapeHtml(z.question||"문제 없음")}</h4>${z.options?`<div class="quiz-options"><b>보기/힌트</b><br>${escapeHtml(z.options)}</div>`:""}${z.answer?`<div class="quiz-answer"><b>정답</b><br>${escapeHtml(z.answer)}</div>`:""}${z.explanation?`<div class="quiz-answer"><b>해설</b><br>${escapeHtml(z.explanation)}</div>`:""}${z.feedback?`<div class="quiz-feedback"><b>피드백</b><br>${escapeHtml(z.feedback)}</div>`:""}${z.pptNote?`<div class="quiz-options"><b>PPT 메모</b><br>${escapeHtml(z.pptNote)}</div>`:""}<div class="toolbar compact" style="margin-top:10px"><button class="btn small secondary" data-copy>복사</button><button class="btn small secondary" data-load>불러오기</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-copyimg>문제복사</button><button class="btn small secondary" data-img>문제이미지</button><button class="btn small secondary" data-answer-img>정답이미지</button><button class="btn small secondary" data-del>삭제</button></div>`;
         card.addEventListener("click",e=>{ if(e.target.closest("button")) return; fillQuizForm(z); });
         card.querySelector("[data-copy]").addEventListener("click",()=>copyTextWithToast(formatQuizForPpt(z),"퀴즈를 복사했습니다"));
         card.querySelector("[data-load]").addEventListener("click",()=>fillQuizForm(z));
+        card.querySelector("[data-copyimg]").addEventListener("click",()=>copyQuizImage(z,"question"));
         card.querySelector("[data-img]").addEventListener("click",()=>downloadQuizImage(z,"question"));
         card.querySelector("[data-answer-img]").addEventListener("click",()=>downloadQuizImage(z,"answer"));
         card.querySelector("[data-del]").addEventListener("click",()=>{ if(!confirm("이 퀴즈를 삭제할까요?")) return; cur.quizzes=cur.quizzes.filter(x=>x.id!==z.id); persistSermon(cur); });
@@ -919,7 +921,7 @@ service cloud.firestore {
       else { (e.shiftKey ? textareas[textareas.length-1] : textareas[0])?.focus(); }
     }
 
-    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:8,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
+    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:10,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
     async function importJson(){ const file=els.importFile.files?.[0]; if(!file) return alert("불러올 JSON 파일을 선택하세요."); try{ const data=JSON.parse(await file.text()); const arr=Array.isArray(data)?data:(data.sermons||[]); if(data.updateNotes){ state.updateNotes=data.updateNotes; } if(Array.isArray(data.updateHistory)) state.updateHistory=data.updateHistory; if(Array.isArray(data.reflectionBox)) state.reflectionBox=mergeQuestionBoxes(state.reflectionBox,data.reflectionBox); if(Array.isArray(data.prepQuestionBox)) state.prepQuestionBox=mergeQuestionBoxes(state.prepQuestionBox,data.prepQuestionBox); await saveSystemDoc(); renderUpdatePreview(); renderReflectionBox(); if(!arr.length) return alert("설교일지 데이터가 없습니다."); for(const item of arr){ const id=item.id||uid(); const s=normalizeSermon({...item,id,localOnly:false,updatedAtClient:new Date().toISOString()}); state.sermons[id]=s; await saveSermon(s); } state.currentId=arr[0].id; saveLocal(); renderAll(); alert("백업을 불러왔습니다."); }catch(e){ console.error(e); alert("JSON 파일을 읽지 못했습니다."); } }
 
     function handleShortcuts(e){
@@ -928,7 +930,7 @@ service cloud.firestore {
       const ctrl=e.ctrlKey||e.metaKey;
       const shift=e.shiftKey;
       const alt=e.altKey;
-      if(shift && (e.key==="?" || key==="/")){ e.__sermonHandled=true; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation?.(); openHelp(); return; }
+      if(ctrl && shift && (key==="/" || e.key==="?")){ e.__sermonHandled=true; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation?.(); openHelp(); return; }
       if(!ctrl && !alt && key==="delete" && !isTypingTarget(e.target)){ e.__sermonHandled=true; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation?.(); deleteCurrent(); return; }
       if(!ctrl) { if(key==="escape"){ els.quickPad.classList.remove("open"); closeUpdateLog(); closeHelp(); els.reflectionAskPanel?.classList.remove("open"); } return; }
       let combo = `${shift?"shift+":""}${alt?"alt+":""}${key}`;
