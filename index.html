@@ -112,8 +112,8 @@
               <div class="toolbar right"><button class="btn secondary" id="btnClearQuestions">질문 답변 비우기</button><button class="btn" id="btnApplyQuestions">답변을 원고 틀로 반영</button></div>
             </div>
             <details open><summary>질문목록집 · 사용할 질문 선택</summary><div>
-              <div class="inline-search"><input id="questionBankSearch" placeholder="질문목록집 검색" /><input id="customPrepQuestion" placeholder="내 질문 직접 추가" /><button class="btn small" id="btnAddCustomPrepQuestion">추가</button></div>
-              <div class="toolbar" style="margin-bottom:8px"><button class="btn small secondary" id="btnSelectAllBank">전체 선택</button><button class="btn small secondary" id="btnClearBank">전체 해제</button></div>
+              <div class="inline-search"><select id="questionBankCategory" title="질문 종류"><option value="current">현재 설교형식 질문</option><option value="all">전체 질문</option></select><input id="questionBankSearch" placeholder="질문목록집 검색" /><input id="customPrepQuestion" placeholder="내 질문 직접 추가" /><button class="btn small" id="btnAddCustomPrepQuestion">추가</button></div>
+              <div class="toolbar" style="margin-bottom:8px"><button class="btn small secondary" id="btnSelectAllBank">현재 조건 전체 선택</button><button class="btn small secondary" id="btnClearBank">현재 조건 해제</button></div>
               <div id="questionBankList" class="bank-list"></div>
             </div></details>
             <details open><summary>설교 준비 점검표</summary><div><table class="mini-table"><tbody><tr><th>본문</th><td>본문이 말하는 핵심을 내 생각보다 앞에 두었는가?</td></tr><tr><th>청중</th><td>듣는 사람의 실제 고민과 연결되는가?</td></tr><tr><th>복음</th><td>결론이 단순한 교훈이 아니라 은혜와 복음으로 이어지는가?</td></tr><tr><th>적용</th><td>오늘 실천할 수 있는 구체적인 한 걸음이 있는가?</td></tr><tr><th>표현</th><td>수어통역·낭독·청중 이해를 고려해 문장이 너무 길지 않은가?</td></tr></tbody></table></div></details>
@@ -252,7 +252,7 @@ service cloud.firestore {
     const els = {
       syncDot:$("syncDot"), syncText:$("syncText"), countPill:$("countPill"), roomInput:$("roomInput"), listCount:$("listCount"), sermonList:$("sermonList"), searchInput:$("searchInput"), filterStructure:$("filterStructure"), sortMode:$("sortMode"), statsBox:$("statsBox"),
       sermonDate:$("sermonDate"), sermonDateText:$("sermonDateText"), structureSelect:$("structureSelect"), structureGuide:$("structureGuide"), titleInput:$("titleInput"), passageInput:$("passageInput"), passageUrlInput:$("passageUrlInput"), audienceInput:$("audienceInput"), keywordsInput:$("keywordsInput"), themeInput:$("themeInput"), onePointInput:$("onePointInput"), purposeInput:$("purposeInput"), textNoteInput:$("textNoteInput"), summaryInput:$("summaryInput"),
-      prepSearch:$("prepSearch"), questionList:$("questionList"), questionBankSearch:$("questionBankSearch"), questionBankList:$("questionBankList"), customPrepQuestion:$("customPrepQuestion"),
+      prepSearch:$("prepSearch"), questionList:$("questionList"), questionBankCategory:$("questionBankCategory"), questionBankSearch:$("questionBankSearch"), questionBankList:$("questionBankList"), customPrepQuestion:$("customPrepQuestion"),
       reflectionSearch:$("reflectionSearch"), reflectionAskPanel:$("reflectionAskPanel"), reflectionAskInput:$("reflectionAskInput"), reflectionSort:$("reflectionSort"), reflectionList:$("reflectionList"), customReflectionQuestion:$("customReflectionQuestion"), reflectionBoxList:$("reflectionBoxList"), manuscriptInput:$("manuscriptInput"), previewTitle:$("previewTitle"), previewMeta:$("previewMeta"), previewContent:$("previewContent"), wordCount:$("wordCount"),
       todoText:$("todoText"), todoDue:$("todoDue"), todoType:$("todoType"), todoImportant:$("todoImportant"), todoSearch:$("todoSearch"), todoList:$("todoList"),
       feedbackCategory:$("feedbackCategory"), feedbackTopic:$("feedbackTopic"), feedbackSource:$("feedbackSource"), feedbackStatus:$("feedbackStatus"), feedbackText:$("feedbackText"), feedbackAction:$("feedbackAction"), feedbackSearch:$("feedbackSearch"), feedbackList:$("feedbackList"), globalFeedbackSearch:$("globalFeedbackSearch"), globalFeedbackFilter:$("globalFeedbackFilter"), globalFeedbackBoard:$("globalFeedbackBoard"),
@@ -265,6 +265,7 @@ service cloud.firestore {
       document.querySelectorAll("button").forEach(b => b.type = "button");
       els.roomInput.value = state.room;
       Object.keys(structures).forEach(name => { const opt = document.createElement("option"); opt.value = name; opt.textContent = name; els.structureSelect.appendChild(opt); });
+      initQuestionBankCategoryOptions();
       loadLocal();
       bindEvents();
       if(!state.currentId || !state.sermons[state.currentId]) state.currentId = sortedSermons()[0]?.id || null;
@@ -331,6 +332,7 @@ service cloud.firestore {
       els.sortMode.addEventListener("change", renderList);
       els.prepSearch.addEventListener("input", renderPrepQuestions);
       els.questionBankSearch.addEventListener("input", renderQuestionBank);
+      els.questionBankCategory?.addEventListener("change", renderQuestionBank);
       els.reflectionSearch.addEventListener("input", renderReflectionQuestions);
       els.reflectionSort.addEventListener("change", renderReflectionQuestions);
       els.todoSearch.addEventListener("input", renderTodos);
@@ -346,6 +348,22 @@ service cloud.firestore {
       els.structureSelect.addEventListener("change", () => { const cur=currentOrCreate(); cur.structure=els.structureSelect.value; addDefaultPrepQuestions(cur, true); applyStructureGuide(); refreshBasicPlaceholders(); scheduleSave(); renderPrepQuestions(); renderQuestionBank(); applyStructureGuide(); refreshBasicPlaceholders(); renderPreview(); });
       document.addEventListener("keydown", handleShortcuts, true);
       window.addEventListener("keydown", handleShortcuts, true);
+    }
+
+
+    function initQuestionBankCategoryOptions(){
+      if(!els.questionBankCategory) return;
+      const keep = els.questionBankCategory.value || "current";
+      const categories = new Set(["current","all", ...Object.keys(structures), "기본", ...extraQuestionBank.map(x=>x.category)]);
+      els.questionBankCategory.innerHTML = "";
+      const labels = {current:"현재 설교형식 질문", all:"전체 질문"};
+      categories.forEach(cat=>{
+        const opt=document.createElement("option");
+        opt.value=cat;
+        opt.textContent=labels[cat] || cat;
+        els.questionBankCategory.appendChild(opt);
+      });
+      els.questionBankCategory.value = categories.has(keep) ? keep : "current";
     }
 
     async function initFirebase(){
@@ -486,6 +504,8 @@ service cloud.firestore {
     function sortQuestionListForDisplay(list, answers={}, mode="manual"){ return [...(list||[])].sort((a,b)=>{ const av=answers[a.id]||{}, bv=answers[b.id]||{}; if(!!av.resolved !== !!bv.resolved) return av.resolved?1:-1; if(!av.resolved && !!a.pinned !== !!b.pinned) return a.pinned?-1:1; if(av.resolved && bv.resolved) return String(bv.resolvedAt||"").localeCompare(String(av.resolvedAt||"")); if(mode==="alpha") return String(a.text||"").localeCompare(String(b.text||""),"ko"); if(mode==="updatedDesc") return String(b.updatedAt||bv.updatedAt||"").localeCompare(String(a.updatedAt||av.updatedAt||"")); if(mode==="createdAsc") return String(a.createdAt||"").localeCompare(String(b.createdAt||"")); return (a.order??0)-(b.order??0); }); }
     function getDefaultPrepQuestions(structure){ return [...(structures[structure]?.questions||structures["서론-본론-결론"].questions).map(t=>makeQuestion(t, structure)), ...basePrepQuestions.map(t=>makeQuestion(t,"기본"))]; }
     function allBankQuestions(){ const map=new Map(); Object.entries(structures).forEach(([cat, data])=>data.questions.forEach(t=>map.set(makeQuestion(t,cat).id, makeQuestion(t,cat)))); basePrepQuestions.forEach(t=>map.set(makeQuestion(t,"기본").id, makeQuestion(t,"기본"))); extraQuestionBank.forEach(x=>map.set(makeQuestion(x.text,x.category).id, makeQuestion(x.text,x.category))); return [...map.values()]; }
+    function masterQuestionIds(){ return new Set(allBankQuestions().map(q=>q.id)); }
+    function isCustomPrepQuestion(q){ return q?.category === "내 질문" || !masterQuestionIds().has(q?.id); }
     function resetPrepQuestionData(cur, clearAnswers=true){ cur.prepQuestions=getDefaultPrepQuestions(cur.structure||"서론-본론-결론"); if(clearAnswers) cur.prepAnswers={}; migrateOldPrepAnswers(cur); }
     function ensurePrepQuestions(cur){ if(!Array.isArray(cur.prepQuestions) || !cur.prepQuestions.length) resetPrepQuestionData(cur, false); migrateOldPrepAnswers(cur); stampQuestionList(cur.prepQuestions); }
     function addDefaultPrepQuestions(cur, appendOnly=false){ const defaults=getDefaultPrepQuestions(cur.structure||"서론-본론-결론"); cur.prepQuestions=Array.isArray(cur.prepQuestions)?cur.prepQuestions:[]; if(!appendOnly) cur.prepQuestions=[]; defaults.forEach(q=>{ if(!cur.prepQuestions.some(x=>x.id===q.id)) cur.prepQuestions.push(q); }); }
@@ -500,21 +520,30 @@ service cloud.firestore {
       list.forEach((q,idx)=>{
         const card=document.createElement("div");
         card.className="question-card"+(q.pinned?" pinned-card":"");
-        card.innerHTML=`<div class="question-title-row"><b>Q${idx+1}. ${escapeHtml(q.text)}</b><div class="toolbar compact"><button class="star-btn ${q.pinned?"on":""}" data-pin title="상단 고정">★</button><button class="btn small secondary" data-up>↑</button><button class="btn small secondary" data-down>↓</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-del>제외</button></div></div><div class="small-note">${escapeHtml(q.category||"질문")}</div><textarea data-prep-key="${escapeHtml(q.id)}" placeholder="답변을 적으면 준비 메모와 원고 틀에 활용됩니다.">${escapeHtml(cur.prepAnswers?.[q.id]||"")}</textarea>`;
-        card.querySelector("textarea").addEventListener("input", e=>{ cur.prepAnswers=cur.prepAnswers||{}; cur.prepAnswers[q.id]=e.target.value; q.updatedAt=new Date().toISOString(); persistSermon(cur,{render:false, remote:false}); scheduleSave(); });
+        card.innerHTML=`<div class="question-title-row"><b>Q${idx+1}. ${escapeHtml(q.text)}</b><div class="toolbar compact"><button tabindex="-1" class="star-btn ${q.pinned?"on":""}" data-pin title="상단 고정">★</button><button tabindex="-1" class="btn small secondary" data-copy-q>질문복사</button><button tabindex="-1" class="btn small secondary" data-copy-a>내용복사</button><button tabindex="-1" class="btn small secondary" data-up>↑</button><button tabindex="-1" class="btn small secondary" data-down>↓</button><button tabindex="-1" class="btn small secondary" data-edit>수정</button><button tabindex="-1" class="btn small secondary" data-del>제외</button></div></div><div class="small-note">${escapeHtml(q.category||"질문")}</div><textarea data-prep-key="${escapeHtml(q.id)}" placeholder="답변을 적으면 준비 메모와 원고 틀에 활용됩니다.">${escapeHtml(cur.prepAnswers?.[q.id]||"")}</textarea>`;
+        const ta=card.querySelector("textarea");
+        ta.addEventListener("input", e=>{ cur.prepAnswers=cur.prepAnswers||{}; cur.prepAnswers[q.id]=e.target.value; q.updatedAt=new Date().toISOString(); persistSermon(cur,{render:false, remote:false}); scheduleSave(); });
         card.querySelector("[data-copy-q]").addEventListener("click",()=>copyTextWithToast(q.text,"질문을 복사했습니다"));
         card.querySelector("[data-copy-a]").addEventListener("click",()=>copyTextWithToast(ta.value||"","답변 내용을 복사했습니다"));
         card.querySelector("[data-pin]").addEventListener("click",()=>{ q.pinned=!q.pinned; q.updatedAt=new Date().toISOString(); persistSermon(cur); });
         card.querySelector("[data-up]").addEventListener("click",()=>{ moveQuestion(cur.prepQuestions,q.id,-1); persistSermon(cur); });
-        card.querySelector("[data-copy-q]").addEventListener("click",()=>copyTextWithToast(q.text,"질문을 복사했습니다"));
-        card.querySelector("[data-copy-a]").addEventListener("click",()=>copyTextWithToast(card.querySelector("textarea")?.value||"","답변 내용을 복사했습니다"));
         card.querySelector("[data-down]").addEventListener("click",()=>{ moveQuestion(cur.prepQuestions,q.id,1); persistSermon(cur); });
         card.querySelector("[data-edit]").addEventListener("click",()=>{ const nv=prompt("준비질문 수정", q.text); if(nv===null) return; q.text=nv.trim()||q.text; q.updatedAt=new Date().toISOString(); persistSermon(cur); });
         card.querySelector("[data-del]").addEventListener("click",()=>{ cur.prepQuestions=(cur.prepQuestions||[]).filter(x=>x.id!==q.id); persistSermon(cur); });
         els.questionList.appendChild(card);
       });
     }
-    function filteredBankQuestions(){ const search=(els.questionBankSearch.value||"").toLowerCase().trim(); return allBankQuestions().filter(q=>!search || [q.text,q.category].join(" ").toLowerCase().includes(search)); }
+    function filteredBankQuestions(){
+      const search=(els.questionBankSearch.value||"").toLowerCase().trim();
+      const cur=current();
+      const mode=els.questionBankCategory?.value || "current";
+      const currentStructure=cur?.structure || els.structureSelect?.value || "서론-본론-결론";
+      return allBankQuestions().filter(q=>{
+        const categoryOk = mode === "all" || (mode === "current" ? q.category === currentStructure : q.category === mode);
+        const searchOk = !search || [q.text,q.category].join(" ").toLowerCase().includes(search);
+        return categoryOk && searchOk;
+      });
+    }
     function renderQuestionBank(){
       const cur=current(); if(!cur){ els.questionBankList.innerHTML=""; return; }
       ensurePrepQuestions(cur);
@@ -529,8 +558,8 @@ service cloud.firestore {
       });
     }
     function selectAllBankQuestions(){ const cur=currentOrCreate(); ensurePrepQuestions(cur); filteredBankQuestions().forEach(q=>{ if(!cur.prepQuestions.some(x=>x.id===q.id)) cur.prepQuestions.push({...q, order:cur.prepQuestions.length, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}); }); persistSermon(cur); }
-    function clearBankQuestions(){ const cur=currentOrCreate(); if(!confirm("현재 선택된 준비질문을 모두 해제할까요? 답변 내용은 저장되어 있다가 같은 질문을 다시 선택하면 이어서 볼 수 있습니다.")) return; cur.prepQuestions=[]; persistSermon(cur); }
-    function resetPrepQuestions(){ const cur=currentOrCreate(); if(!confirm("현재 설교의 준비질문 목록을 형식 기본질문으로 다시 구성할까요? 답변은 가능한 유지됩니다.")) return; const old={...(cur.prepAnswers||{})}; resetPrepQuestionData(cur,false); cur.prepAnswers=old; persistSermon(cur); }
+    function clearBankQuestions(){ const cur=currentOrCreate(); const ids=new Set(filteredBankQuestions().map(q=>q.id)); if(!ids.size) return; if(!confirm("현재 필터/검색 조건에 보이는 준비질문 선택을 해제할까요? 답변 내용은 저장되어 있다가 같은 질문을 다시 선택하면 이어서 볼 수 있습니다.")) return; cur.prepQuestions=(cur.prepQuestions||[]).filter(q=>!ids.has(q.id)); persistSermon(cur); }
+    function resetPrepQuestions(){ const cur=currentOrCreate(); if(!confirm("현재 설교의 준비질문 목록을 현재 설교 형식의 기본질문으로 복원할까요? 내가 추가했던 질문은 아래에 그대로 보존됩니다.")) return; const old={...(cur.prepAnswers||{})}; const custom=(cur.prepQuestions||[]).filter(isCustomPrepQuestion); resetPrepQuestionData(cur,false); const seen=new Set(cur.prepQuestions.map(q=>q.id)); custom.forEach(q=>{ if(!seen.has(q.id)){ cur.prepQuestions.push({...q, order:cur.prepQuestions.length, updatedAt:new Date().toISOString()}); seen.add(q.id); } }); cur.prepAnswers=old; stampQuestionList(cur.prepQuestions); persistSermon(cur); }
     function addCustomPrepQuestion(){ const text=els.customPrepQuestion.value.trim(); if(!text) return; const cur=currentOrCreate(); ensurePrepQuestions(cur); const q={...makeQuestion(text,"내 질문"), order:cur.prepQuestions.length, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}; if(!cur.prepQuestions.some(x=>x.id===q.id)) cur.prepQuestions.push(q); els.customPrepQuestion.value=""; persistSermon(cur); showTab("prep"); }
     function clearQuestionAnswers(){ const cur=current(); if(!cur) return; if(!confirm("현재 설교의 준비질문 답변을 비울까요?")) return; cur.prepAnswers={}; persistSermon(cur); }
     function applyQuestionsToManuscript(){ const cur=collectCurrent(); ensurePrepQuestions(cur); const qs=(cur.prepQuestions||[]).map((q,i)=>({q:`Q${i+1}. ${q.text}`, a:(cur.prepAnswers?.[q.id]||"").trim()})).filter(x=>x.a); const lines=[]; lines.push(cur.title||"제목 없음"); lines.push(`본문: ${cur.passage||"본문 미입력"}`); if(cur.onePoint) lines.push(`핵심 한 문장: ${cur.onePoint}`); lines.push(""); lines.push(...(structures[cur.structure]?.headings||["서론","본론","결론"]).map(h=>`## ${h}\n`)); if(qs.length){ lines.push("\n## 준비질문에서 정리한 내용"); qs.forEach(x=>{ lines.push(`\n${x.q.replace(/^Q\d+\.\s*/,"")}`); lines.push(x.a); }); } const scaffold=lines.join("\n"); if((cur.manuscript||"").trim()&&!confirm("기존 원고 뒤에 준비질문 내용을 추가할까요? 취소하면 중단됩니다.")) return; els.manuscriptInput.value=(cur.manuscript?.trim()?cur.manuscript.trim()+"\n\n":"")+scaffold; saveCurrent({silent:true}); showTab("manuscript"); }
@@ -549,7 +578,7 @@ service cloud.firestore {
       list.forEach((q,idx)=>{
         const val=cur.reflectionAnswers?.[q.id]||{}; const resolved=!!val.resolved;
         const card=document.createElement("div"); card.className="question-card"+(resolved?" done-card":"")+(q.pinned&&!resolved?" pinned-card":""); card.dataset.reflectionKey=q.id;
-        card.innerHTML=`<div class="question-title-row"><b>R${idx+1}. ${escapeHtml(q.text)} ${resolved&&val.resolvedAt?`<span class="resolved-date">해소: ${escapeHtml(formatDateTime(val.resolvedAt))}</span>`:""}</b><div class="toolbar compact"><button class="star-btn ${q.pinned?"on":""}" data-pin title="상단 고정">★</button><button class="btn small secondary" data-copy-q>질문복사</button><button class="btn small secondary" data-copy-a>내용복사</button><button class="btn small secondary" data-up>↑</button><button class="btn small secondary" data-down>↓</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-del>삭제</button></div></div><textarea data-resize-key="${escapeHtml(q.id)}" placeholder="답변, 아직 남은 질문, 해소 과정 등을 적어두세요.">${escapeHtml(val.answer||"")}</textarea><div class="question-tools"><label class="checkline"><input type="checkbox" data-reflection-done ${resolved?"checked":""}/> 이 질문은 해소됨</label></div>`;
+        card.innerHTML=`<div class="question-title-row"><b>R${idx+1}. ${escapeHtml(q.text)} ${resolved&&val.resolvedAt?`<span class="resolved-date">해소: ${escapeHtml(formatDateTime(val.resolvedAt))}</span>`:""}</b><div class="toolbar compact"><button tabindex="-1" class="star-btn ${q.pinned?"on":""}" data-pin title="상단 고정">★</button><button tabindex="-1" class="btn small secondary" data-copy-q>질문복사</button><button tabindex="-1" class="btn small secondary" data-copy-a>내용복사</button><button tabindex="-1" class="btn small secondary" data-up>↑</button><button tabindex="-1" class="btn small secondary" data-down>↓</button><button tabindex="-1" class="btn small secondary" data-edit>수정</button><button tabindex="-1" class="btn small secondary" data-del>삭제</button></div></div><textarea data-resize-key="${escapeHtml(q.id)}" placeholder="답변, 아직 남은 질문, 해소 과정 등을 적어두세요.">${escapeHtml(val.answer||"")}</textarea><div class="question-tools"><label class="checkline"><input type="checkbox" data-reflection-done ${resolved?"checked":""}/> 이 질문은 해소됨</label></div>`;
         const ta=card.querySelector("textarea");
         if(val.height) ta.style.height=val.height;
         const rememberHeight=()=>{ cur.reflectionAnswers[q.id]=cur.reflectionAnswers[q.id]||{}; cur.reflectionAnswers[q.id].height=ta.style.height && ta.style.height !== "auto" ? ta.style.height : `${ta.offsetHeight}px`; saveLocal(); debounceRemoteSave(cur); };
@@ -572,7 +601,7 @@ service cloud.firestore {
       const existing=new Set((cur?.reflectionQuestions||[]).map(q=>q.id));
       const list=mergeQuestionBoxes([], state.reflectionBox||[]).filter(q=>!existing.has(q.id));
       els.reflectionBoxList.innerHTML=list.length?"":`<div class="empty">보관된 내 질문이 없습니다.</div>`;
-      list.forEach(q=>{ const row=document.createElement("div"); row.className="reflection-box-item"; row.innerHTML=`<div><b>${escapeHtml(q.text)}</b><div class="small-note">${escapeHtml(q.category||"내 질문")}</div></div><button class="btn small secondary">다시 사용</button>`; row.querySelector("button").addEventListener("click",()=>{ const c=currentOrCreate(); ensureReflectionQuestions(c); if(!c.reflectionQuestions.some(x=>x.id===q.id)) c.reflectionQuestions.push({...q, order:c.reflectionQuestions.length, updatedAt:new Date().toISOString()}); persistSermon(c); renderReflectionBox(); showTab("reflect"); }); els.reflectionBoxList.appendChild(row); });
+      list.forEach(q=>{ const row=document.createElement("div"); row.className="reflection-box-item"; row.innerHTML=`<div><b>${escapeHtml(q.text)}</b><div class="small-note">${escapeHtml(q.category||"내 질문")}</div></div><button type="button" class="btn small secondary">다시 사용</button>`; row.querySelector("button").addEventListener("click",e=>{ e.preventDefault(); e.stopPropagation(); const c=currentOrCreate(); ensureReflectionQuestions(c); let item={...q, updatedAt:new Date().toISOString(), createdAt:q.createdAt||new Date().toISOString()}; if(c.reflectionQuestions.some(x=>x.id===item.id)){ item={...item,id:"r_"+uid()}; } item.order=c.reflectionQuestions.length; c.reflectionQuestions.push(item); persistSermon(c); renderReflectionQuestions(); renderReflectionBox(); showTab("reflect"); setStatus("성찰질문으로 다시 가져왔습니다","ok"); }); els.reflectionBoxList.appendChild(row); });
     }
     function addCustomReflectionQuestion(){ const text=els.customReflectionQuestion.value.trim(); if(!text) return; addReflectionQuestionText(text); els.customReflectionQuestion.value=""; }
 
@@ -650,7 +679,7 @@ service cloud.firestore {
     function showCopyToast(msg){ if(!els.copyToast) return; els.copyToast.textContent=msg; els.copyToast.classList.add("show"); clearTimeout(showCopyToast._t); showCopyToast._t=setTimeout(()=>els.copyToast.classList.remove("show"),1200); }
 
 
-    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:5,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
+    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:6,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
     async function importJson(){ const file=els.importFile.files?.[0]; if(!file) return alert("불러올 JSON 파일을 선택하세요."); try{ const data=JSON.parse(await file.text()); const arr=Array.isArray(data)?data:(data.sermons||[]); if(data.updateNotes){ state.updateNotes=data.updateNotes; } if(Array.isArray(data.updateHistory)) state.updateHistory=data.updateHistory; if(Array.isArray(data.reflectionBox)) state.reflectionBox=mergeQuestionBoxes(state.reflectionBox,data.reflectionBox); await saveSystemDoc(); renderUpdatePreview(); renderReflectionBox(); if(!arr.length) return alert("설교일지 데이터가 없습니다."); for(const item of arr){ const id=item.id||uid(); const s=normalizeSermon({...item,id,localOnly:false,updatedAtClient:new Date().toISOString()}); state.sermons[id]=s; await saveSermon(s); } state.currentId=arr[0].id; saveLocal(); renderAll(); alert("백업을 불러왔습니다."); }catch(e){ console.error(e); alert("JSON 파일을 읽지 못했습니다."); } }
 
     function handleShortcuts(e){
