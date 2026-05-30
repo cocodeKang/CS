@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>설교일지 v1.8 · Firestore 동기화</title>
+  <title>설교일지 v1.9 · Firestore 동기화</title>
   <style>
     :root{
       --bg:#f6f4ef;--paper:#fffdf8;--card:#fff;--ink:#1d211f;--muted:#6f746f;--line:#e2ddd2;
@@ -32,7 +32,7 @@
     .tabs{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);background:#fffdf8}.tab{padding:8px 10px;border-radius:999px;background:transparent;color:var(--muted);font-size:13px;font-weight:800}.tab.active{background:var(--accent);color:#fff}.view{display:none}.view.active{display:block}.editor-scroll{max-height:calc(100vh - 165px);overflow:auto}.right-scroll{max-height:calc(100vh - 165px);overflow:auto}
     .manuscript{min-height:520px;font-family:var(--serif);font-size:17px;line-height:1.9;padding:18px;background:#fffefb}.manuscript-tools{position:sticky;top:0;background:#fff;z-index:3;padding:10px;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}.paper-preview{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:inset 0 0 0 1px #fff;margin-top:10px}.paper-preview h3{margin:0 0 10px;font-size:20px}.paper-meta{font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}.paper-content{white-space:pre-wrap;font-family:var(--serif);line-height:1.9;font-size:16px}
     .question-card{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fffdf8;margin-bottom:10px}.question-card b{font-size:13px}.question-card textarea{margin-top:8px;min-height:80px;background:#fff}.question-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}.checkline{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);font-weight:800}.checkline input{width:18px;height:18px;accent-color:var(--accent)}
-    .todo-row,.feedback-card,.quiz-card{border:1px solid var(--line);border-radius:16px;background:#fffdf8;padding:12px;margin-bottom:10px}.todo-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start}.todo-row input[type=checkbox]{width:22px;height:22px;margin-top:3px;accent-color:var(--accent)}.todo-title{font-weight:800}.todo-done .todo-title{text-decoration:line-through;color:var(--muted)}.todo-meta{font-size:12px;color:var(--muted);margin-top:3px}.feedback-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}.feedback-title{font-weight:900}.feedback-text{white-space:pre-wrap;line-height:1.5}.feedback-reflect{margin-top:8px;background:#f7f6f0;border-radius:12px;padding:8px}.feedback-reflect label{font-size:11px;color:var(--muted);font-weight:900}.feedback-reflect textarea{min-height:72px;margin-top:5px;background:#fff}.quiz-card h4{margin:0 0 8px;font-size:14px}.quiz-question{white-space:pre-wrap;line-height:1.55;font-weight:800}.quiz-options,.quiz-answer,.quiz-feedback{white-space:pre-wrap;font-size:12px;color:var(--muted);margin-top:6px}.quiz-feedback{background:#f7f6f0;border-radius:12px;padding:8px}.quiz-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;background:#eee9dc;color:#5c5243;font-size:11px;font-weight:800}
+    .todo-row,.feedback-card,.quiz-card{border:1px solid var(--line);border-radius:16px;background:#fffdf8;padding:12px;margin-bottom:10px}.todo-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start}.todo-row input[type=checkbox]{width:22px;height:22px;margin-top:3px;accent-color:var(--accent)}.todo-title{font-weight:800}.todo-done .todo-title{text-decoration:line-through;color:var(--muted)}.todo-meta{font-size:12px;color:var(--muted);margin-top:3px}.feedback-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}.feedback-title{font-weight:900}.feedback-text{white-space:pre-wrap;line-height:1.5}.feedback-reflect{margin-top:8px;background:#f7f6f0;border-radius:12px;padding:8px}.feedback-reflect label{font-size:11px;color:var(--muted);font-weight:900}.feedback-reflect textarea{min-height:72px;margin-top:5px;background:#fff}.quiz-card h4{margin:0 0 8px;font-size:14px}.choice-grid{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center}.choice-grid label{font-size:12px;font-weight:900;color:#4d554d}.choice-panel{border:1px dashed var(--line);border-radius:14px;background:#fffdf8;padding:10px;margin-bottom:10px}.date-row .btn{white-space:nowrap}.quiz-question{white-space:pre-wrap;line-height:1.55;font-weight:800}.quiz-options,.quiz-answer,.quiz-feedback{white-space:pre-wrap;font-size:12px;color:var(--muted);margin-top:6px}.quiz-feedback{background:#f7f6f0;border-radius:12px;padding:8px}.quiz-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;background:#eee9dc;color:#5c5243;font-size:11px;font-weight:800}
     .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{border:1px solid var(--line);border-radius:14px;background:#fffdf8;padding:11px}.stat b{font-size:20px;display:block}.stat span{font-size:11px;color:var(--muted)}
     details{border:1px solid var(--line);border-radius:14px;background:#fffdf8;margin-bottom:10px;overflow:hidden}summary{cursor:pointer;padding:11px 12px;font-weight:900;color:#394139}details>div{padding:0 12px 12px}.mini-table{width:100%;border-collapse:collapse;font-size:12px}.mini-table th,.mini-table td{border-bottom:1px solid var(--line);padding:7px;text-align:left;vertical-align:top}.mini-table th{color:var(--muted);font-weight:900;background:#fffdf8}
     .quick-toggle{position:fixed;right:18px;bottom:18px;z-index:50;width:58px;height:58px;border-radius:22px;background:var(--accent2);color:#fff;box-shadow:0 18px 36px rgba(76,58,34,.25);font-size:24px;font-weight:900}.quick-pad{position:fixed;right:18px;bottom:86px;z-index:49;width:min(420px,calc(100vw - 28px));background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 22px 60px rgba(43,36,25,.25);overflow:hidden;display:none}.quick-pad.open{display:block}.quick-pad header{padding:12px 14px;background:#fffdf8;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.quick-pad textarea{border:0;border-radius:0;min-height:150px;box-shadow:none}.quick-pad footer{padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);background:#fffdf8}
@@ -56,7 +56,7 @@
 <body data-mobile-panel="edit">
   <div class="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.8</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
+      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.9</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
       <div class="top-actions">
         <span class="pill"><span id="syncDot" class="dot warn"></span><span id="syncText">연결 준비</span></span>
         <span class="pill hide-mobile" id="countPill">0편</span>
@@ -91,7 +91,7 @@
         <div class="editor-scroll" id="editor">
           <div class="panel-body view active" data-view="basic">
             <div class="grid2">
-              <div class="field"><label>설교날짜 <span class="info-dot" data-info="설교 예정일 또는 실제 설교일을 기록합니다. 새 설교는 다가오는 일요일이 자동 입력됩니다.">!</span></label><div class="date-row"><input id="sermonDateText" class="date-display" readonly placeholder="yyyy-mm-dd(요일)" /><button class="btn secondary" id="btnPickDate">[달력]</button><input id="sermonDate" class="date-hidden" type="date" /></div></div>
+              <div class="field"><label>설교날짜 <span class="info-dot" data-info="설교 예정일 또는 실제 설교일을 기록합니다. 새 설교는 다가오는 일요일이 자동 입력됩니다.">!</span></label><div class="date-row"><input id="sermonDateText" class="date-display" readonly placeholder="yyyy-mm-dd(요일)" /><button class="btn secondary" id="btnPickDate" title="달력 열기">📅</button><input id="sermonDate" class="date-hidden" type="date" /></div></div>
               <div class="field"><label>설교 형식 <span class="info-dot" data-info="원고의 큰 구조를 정합니다. 형식을 바꾸면 아래 구성 안내와 준비질문이 그 형식에 맞게 정리됩니다.">!</span></label><select id="structureSelect"></select></div>
             </div>
             <div class="structure-guide" id="structureGuide"></div>
@@ -140,7 +140,7 @@
 
           <div class="panel-body view" data-view="tasks">
             <div class="section"><div class="section-title">설교 관련 할 일 <span class="hint">마감일·중요 표시가 있는 미완료 항목이 위로 올라옵니다.</span></div>
-              <div class="grid3"><input id="todoText" placeholder="할 일: 예화 찾기, 본문 재검토, PPT 제작" /><input id="todoDue" type="date" /><select id="todoType"><option>준비</option><option>원고</option><option>PPT/자료</option><option>연락</option><option>후속관리</option><option>기도</option></select></div>
+              <div class="grid3"><input id="todoText" placeholder="할 일: 예화 찾기, 본문 재검토, PPT 제작" /><div class="date-row"><input id="todoDueText" class="date-display" readonly placeholder="yyyy-mm-dd(요일)" /><button class="btn secondary" id="btnTodoDuePick" title="할 일 마감일 달력">📅</button><input id="todoDue" class="date-hidden" type="date" /></div><select id="todoType"><option>준비</option><option>원고</option><option>PPT/자료</option><option>연락</option><option>후속관리</option><option>기도</option></select></div>
               <div class="toolbar right" style="margin-top:8px"><label class="checkline"><input id="todoImportant" type="checkbox" /> 중요 ★</label><button class="btn" id="btnAddTodo">할 일 추가</button></div>
             </div>
             <div class="inline-search"><input id="todoSearch" placeholder="할 일 검색" /></div>
@@ -156,12 +156,15 @@
           <div class="panel-body view" data-view="quiz">
             <div class="section">
               <div class="section-title">마지막주 퀴즈 기록 <span class="hint">PPT에 넣을 질문 데이터를 일지에서 관리합니다.</span></div>
-              <div class="grid3"><div class="field"><label>퀴즈 날짜</label><input id="quizDate" type="date" /></div><div class="field"><label>대상</label><select id="quizTarget"><option>유치부</option><option>유년부</option><option>초등부</option><option>전체</option><option>기타</option></select></div><div class="field"><label>형식</label><select id="quizFormat"><option>OX</option><option>객관식</option><option>초성</option><option>주관식</option><option>빈칸</option><option>그림퀴즈</option><option>넌센스</option></select></div></div>
+              <div class="grid3"><div class="field"><label>퀴즈 날짜</label><div class="date-row"><input id="quizDateText" class="date-display" readonly placeholder="yyyy-mm-dd(요일)" /><button class="btn secondary" id="btnQuizDatePick" title="퀴즈 날짜 달력">📅</button><input id="quizDate" class="date-hidden" type="date" /></div></div><div class="field"><label>대상</label><select id="quizTarget"><option>유치부</option><option>유년부</option><option>초등부</option><option>전체</option><option>기타</option></select></div><div class="field"><label>형식</label><select id="quizFormat"><option>OX</option><option>객관식</option><option>초성</option><option>주관식</option><option>빈칸</option><option>그림퀴즈</option><option>넌센스</option></select></div></div>
+              <div class="field"><label>성경구절</label><div class="date-row"><input id="quizPassage" placeholder="예: 창 1:2-3 or 창 1:2~3" /><button class="btn secondary" id="btnQuizBible" title="성경검색 열기">📖</button></div></div>
               <div class="field"><label>문제</label><textarea id="quizQuestion" placeholder="예: 하나님께서 애굽에 내리신 재앙 중 첫 번째 재앙은 무엇일까요?"></textarea></div>
-              <div class="grid2"><div class="field"><label>보기 / 힌트</label><textarea id="quizOptions" placeholder="객관식 보기, 초성 힌트, OX 설명 등을 적어두세요."></textarea></div><div class="field"><label>정답</label><textarea id="quizAnswer" placeholder="정답 또는 해설"></textarea></div></div>
+              <div class="choice-panel" id="quizChoicePanel" hidden><div class="grid2"><div class="field"><label>객관식 문항 수</label><select id="quizChoiceCount"><option>2</option><option>3</option><option selected>4</option><option>5</option></select></div><div class="field"><label>보기 안내</label><div class="hint">숫자는 자동으로 붙습니다. 보기 텍스트만 입력하세요.</div></div></div><div id="quizChoiceInputs" class="choice-grid"></div></div>
+              <div class="grid2"><div class="field"><label>보기 / 힌트</label><textarea id="quizOptions" placeholder="초성 힌트, OX 설명, 그림퀴즈 힌트 등을 적어두세요. 객관식은 위 보기칸이 자동 반영됩니다."></textarea></div><div class="field"><label>정답</label><textarea id="quizAnswer" placeholder="정답만 따로 적어두세요."></textarea></div></div>
+              <div class="field"><label>해설</label><textarea id="quizExplanation" placeholder="왜 이 답인지, 아이들에게 설명할 핵심 문장을 적어두세요."></textarea></div>
               <div class="field"><label>퀴즈 피드백</label><textarea id="quizFeedback" placeholder="아이들이 어려워했던 점, 다음에는 바꿀 점, PPT에서 보완할 점"></textarea></div>
               <div class="field"><label>PPT 메모</label><textarea id="quizPptNote" placeholder="PPT에 넣을 문구, 그림 아이디어, 애니메이션 순서 등"></textarea></div>
-              <div class="toolbar right"><button class="btn secondary" id="btnCopyQuizPpt">PPT용 텍스트 복사</button><button class="btn secondary" id="btnDownloadQuizImage">16:9 이미지 저장</button><button class="btn" id="btnAddQuiz">퀴즈 추가</button></div>
+              <div class="toolbar right"><button class="btn secondary" id="btnCopyQuizPpt">PPT용 텍스트 복사</button><button class="btn secondary" id="btnDownloadQuizImage">문제 이미지 저장</button><button class="btn secondary" id="btnDownloadQuizAnswerImage">정답 이미지 저장</button><button class="btn" id="btnAddQuiz">퀴즈 추가</button></div>
             </div>
             <div class="inline-search"><input id="quizSearch" placeholder="퀴즈 검색: 날짜, 대상, 형식, 문제, 정답" /><select id="quizTargetFilter"><option value="">전체 대상</option><option>유치부</option><option>유년부</option><option>초등부</option><option>전체</option><option>기타</option></select></div>
             <div id="quizList"></div>
@@ -224,7 +227,7 @@ service cloud.firestore {
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
     const firebaseConfig = { apiKey:"AIzaSyD92VxaSgN4hRVq-Ba0MrYkzdDctIly_78", authDomain:"cs-log-fdf35.firebaseapp.com", projectId:"cs-log-fdf35", storageBucket:"cs-log-fdf35.firebasestorage.app", messagingSenderId:"768944840140", appId:"1:768944840140:web:03c6d1018dac13a55b9169", measurementId:"G-J0K6PSG2P1" };
-    const STORAGE_KEY = "sermonLog.v3.local";
+    const STORAGE_KEY = "sermonLog.v4.local";
     const LEGACY_STORAGE_KEY = "sermonLog.v2.local";
     const ROOM_KEY = "sermonLog.v2.room";
     const DEFAULT_ROOM = "sermon-log";
@@ -269,9 +272,9 @@ service cloud.firestore {
       sermonDate:$("sermonDate"), sermonDateText:$("sermonDateText"), structureSelect:$("structureSelect"), structureGuide:$("structureGuide"), titleInput:$("titleInput"), passageInput:$("passageInput"), passageUrlInput:$("passageUrlInput"), audienceInput:$("audienceInput"), keywordsInput:$("keywordsInput"), themeInput:$("themeInput"), onePointInput:$("onePointInput"), purposeInput:$("purposeInput"), textNoteInput:$("textNoteInput"), summaryInput:$("summaryInput"),
       prepSearch:$("prepSearch"), questionList:$("questionList"), questionBankCategory:$("questionBankCategory"), questionBankSearch:$("questionBankSearch"), questionBankList:$("questionBankList"), customPrepQuestion:$("customPrepQuestion"),
       reflectionSearch:$("reflectionSearch"), reflectionAskPanel:$("reflectionAskPanel"), reflectionAskInput:$("reflectionAskInput"), reflectionSort:$("reflectionSort"), reflectionList:$("reflectionList"), customReflectionQuestion:$("customReflectionQuestion"), reflectionBoxList:$("reflectionBoxList"), manuscriptInput:$("manuscriptInput"), previewTitle:$("previewTitle"), previewMeta:$("previewMeta"), previewContent:$("previewContent"), wordCount:$("wordCount"),
-      todoText:$("todoText"), todoDue:$("todoDue"), todoType:$("todoType"), todoImportant:$("todoImportant"), todoSearch:$("todoSearch"), todoList:$("todoList"),
+      todoText:$("todoText"), todoDue:$("todoDue"), todoDueText:$("todoDueText"), todoType:$("todoType"), todoImportant:$("todoImportant"), todoSearch:$("todoSearch"), todoList:$("todoList"),
       feedbackCategory:$("feedbackCategory"), feedbackTopic:$("feedbackTopic"), feedbackSource:$("feedbackSource"), feedbackStatus:$("feedbackStatus"), feedbackText:$("feedbackText"), feedbackAction:$("feedbackAction"), feedbackSearch:$("feedbackSearch"), feedbackList:$("feedbackList"), globalFeedbackSearch:$("globalFeedbackSearch"), globalFeedbackFilter:$("globalFeedbackFilter"), globalFeedbackBoard:$("globalFeedbackBoard"),
-      quizDate:$("quizDate"), quizTarget:$("quizTarget"), quizFormat:$("quizFormat"), quizQuestion:$("quizQuestion"), quizOptions:$("quizOptions"), quizAnswer:$("quizAnswer"), quizFeedback:$("quizFeedback"), quizPptNote:$("quizPptNote"), quizSearch:$("quizSearch"), quizTargetFilter:$("quizTargetFilter"), quizList:$("quizList"),
+      quizDate:$("quizDate"), quizDateText:$("quizDateText"), quizTarget:$("quizTarget"), quizFormat:$("quizFormat"), quizPassage:$("quizPassage"), quizQuestion:$("quizQuestion"), quizChoicePanel:$("quizChoicePanel"), quizChoiceCount:$("quizChoiceCount"), quizChoiceInputs:$("quizChoiceInputs"), quizOptions:$("quizOptions"), quizAnswer:$("quizAnswer"), quizExplanation:$("quizExplanation"), quizFeedback:$("quizFeedback"), quizPptNote:$("quizPptNote"), quizSearch:$("quizSearch"), quizTargetFilter:$("quizTargetFilter"), quizList:$("quizList"),
       quickPad:$("quickPad"), quickMemo:$("quickMemo"), printSheet:$("printSheet"), importFile:$("importFile"), updateModal:$("updateModal"), updateNotes:$("updateNotes"), updateSavedAt:$("updateSavedAt"), updatePreview:$("updatePreview"), updateHistoryList:$("updateHistoryList"), updateHistoryCount:$("updateHistoryCount"), helpModal:$("helpModal"), copyToast:$("copyToast")
     };
 
@@ -286,8 +289,9 @@ service cloud.firestore {
       bindEvents();
       if(!state.currentId || !state.sermons[state.currentId]) state.currentId = sortedSermons()[0]?.id || null;
       renderAll();
-      if(els.todoDue) els.todoDue.value=nextSunday();
-      if(els.quizDate) els.quizDate.value=current()?.sermonDate || nextSunday();
+      setDateControl(els.todoDue, els.todoDueText, nextSunday());
+      setDateControl(els.quizDate, els.quizDateText, current()?.sermonDate || nextSunday());
+      updateQuizFormatUI();
       applyStructureGuide();
       initFirebase();
     }
@@ -332,7 +336,17 @@ service cloud.firestore {
       $("btnAddFeedback").addEventListener("click", addFeedbackFromForm);
       $("btnAddQuiz").addEventListener("click", addQuizFromForm);
       $("btnCopyQuizPpt").addEventListener("click", copyQuizPptText);
-      $("btnDownloadQuizImage").addEventListener("click", downloadQuizImage);
+      $("btnDownloadQuizImage").addEventListener("click", () => downloadQuizImage(null, "question"));
+      $("btnDownloadQuizAnswerImage").addEventListener("click", () => downloadQuizImage(null, "answer"));
+      els.quizFormat.addEventListener("change", updateQuizFormatUI);
+      els.quizChoiceCount.addEventListener("change", () => renderChoiceInputs());
+      $("btnQuizBible").addEventListener("click", () => openExternal(buildBibleSearchUrlFromText(els.quizPassage.value)));
+      $("btnQuizDatePick").addEventListener("click", () => openHiddenDatePicker(els.quizDate));
+      els.quizDateText.addEventListener("click", () => openHiddenDatePicker(els.quizDate));
+      els.quizDate.addEventListener("change", () => setDateControl(els.quizDate, els.quizDateText, els.quizDate.value));
+      $("btnTodoDuePick").addEventListener("click", () => openHiddenDatePicker(els.todoDue));
+      els.todoDueText.addEventListener("click", () => openHiddenDatePicker(els.todoDue));
+      els.todoDue.addEventListener("change", () => setDateControl(els.todoDue, els.todoDueText, els.todoDue.value));
       $("btnAddReflectionQuestion").addEventListener("click", addCustomReflectionQuestion);
       $("quickToggle").addEventListener("click", toggleQuickMemo);
       $("quickClose").addEventListener("click", () => els.quickPad.classList.remove("open"));
@@ -520,8 +534,8 @@ service cloud.firestore {
     function renderAll(skipEditor=false){ renderStats(); renderList(); if(Date.now() > typingRenderHoldUntil) renderGlobalFeedback(); renderUpdatePreview(); renderReflectionBox(); if(!skipEditor) renderEditor(); else renderPreview(); els.roomInput.value=state.room; }
     function renderEditorPieces(){ renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); renderGlobalFeedback(); renderStats(); renderList(); renderPreview(); }
 
-    function renderEditor(){ const cur=current(); if(!cur){ clearEditor(); return; } ensurePrepQuestions(cur); ensureReflectionQuestions(cur); els.sermonDate.value=cur.sermonDate || nextSunday(); els.sermonDateText.value=formatDate(els.sermonDate.value); els.structureSelect.value=cur.structure || "서론-본론-결론"; els.titleInput.value=cur.title||""; els.passageInput.value=cur.passage||""; els.passageUrlInput.value=cur.passageUrl||""; els.audienceInput.value=cur.audience||"주일학교예배"; els.keywordsInput.value=cur.keywords||""; els.themeInput.value=cur.theme||""; els.onePointInput.value=cur.onePoint||""; els.purposeInput.value=cur.purpose||""; els.textNoteInput.value=cur.textNote||""; els.summaryInput.value=cur.summary||""; els.manuscriptInput.value=cur.manuscript||""; applyStructureGuide(); refreshBasicPlaceholders(); renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); if(els.todoDue && !els.todoDue.value) els.todoDue.value=nextSunday(); if(els.quizDate && !els.quizDate.value) els.quizDate.value=cur.sermonDate || nextSunday(); renderPreview(); renderList(); }
-    function clearEditor(){ [els.titleInput,els.passageInput,els.passageUrlInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput].forEach(e=>e.value=""); els.audienceInput.value="주일학교예배"; const d=nextSunday(); els.sermonDate.value=d; els.sermonDateText.value=formatDate(d); els.questionList.innerHTML=`<div class="empty">새 설교를 누르거나 내용을 입력하면 준비질문을 사용할 수 있습니다.</div>`; els.questionBankList.innerHTML=""; els.reflectionList.innerHTML=""; els.todoList.innerHTML=""; els.feedbackList.innerHTML=""; if(els.quizList) els.quizList.innerHTML=""; if(els.todoDue) els.todoDue.value=nextSunday(); if(els.quizDate) els.quizDate.value=nextSunday(); renderPreview(); }
+    function renderEditor(){ const cur=current(); if(!cur){ clearEditor(); return; } ensurePrepQuestions(cur); ensureReflectionQuestions(cur); els.sermonDate.value=cur.sermonDate || nextSunday(); els.sermonDateText.value=formatDate(els.sermonDate.value); els.structureSelect.value=cur.structure || "서론-본론-결론"; els.titleInput.value=cur.title||""; els.passageInput.value=cur.passage||""; els.passageUrlInput.value=cur.passageUrl||""; els.audienceInput.value=cur.audience||"주일학교예배"; els.keywordsInput.value=cur.keywords||""; els.themeInput.value=cur.theme||""; els.onePointInput.value=cur.onePoint||""; els.purposeInput.value=cur.purpose||""; els.textNoteInput.value=cur.textNote||""; els.summaryInput.value=cur.summary||""; els.manuscriptInput.value=cur.manuscript||""; applyStructureGuide(); refreshBasicPlaceholders(); renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); if(els.todoDue && !els.todoDue.value) setDateControl(els.todoDue, els.todoDueText, nextSunday()); if(els.quizDate && !els.quizDate.value) setDateControl(els.quizDate, els.quizDateText, cur.sermonDate || nextSunday()); updateQuizFormatUI(); renderPreview(); renderList(); }
+    function clearEditor(){ [els.titleInput,els.passageInput,els.passageUrlInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput].forEach(e=>e.value=""); els.audienceInput.value="주일학교예배"; const d=nextSunday(); els.sermonDate.value=d; els.sermonDateText.value=formatDate(d); els.questionList.innerHTML=`<div class="empty">새 설교를 누르거나 내용을 입력하면 준비질문을 사용할 수 있습니다.</div>`; els.questionBankList.innerHTML=""; els.reflectionList.innerHTML=""; els.todoList.innerHTML=""; els.feedbackList.innerHTML=""; if(els.quizList) els.quizList.innerHTML=""; setDateControl(els.todoDue, els.todoDueText, nextSunday()); setDateControl(els.quizDate, els.quizDateText, nextSunday()); renderPreview(); }
     function renderList(){ const q=(els.searchInput.value||"").toLowerCase().trim(); const fs=els.filterStructure.value; let arr=sermonsArray(true); if(q) arr=arr.filter(s=>[s.title,s.passage,s.keywords,s.theme,s.onePoint,s.summary,s.audience].join(" ").toLowerCase().includes(q)); if(fs) arr=arr.filter(s=>(s.structure||"")===fs); arr=sortArray(arr,els.sortMode.value); els.sermonList.innerHTML=arr.length?"":`<div class="empty">검색 결과가 없습니다.<br>+ 새 설교를 눌러 기록을 시작하세요.</div>`; arr.forEach(s=>{ const item=document.createElement("button"); item.className="sermon-item"+(s.id===state.currentId?" active":""); item.innerHTML=`<div class="sermon-date">${escapeHtml(formatDate(s.sermonDate||nextSunday()))}</div><div style="min-width:0;flex:1;text-align:left"><div class="sermon-title">${escapeHtml(s.title||"제목 없음")}</div><div class="sermon-meta">${escapeHtml(s.passage||"본문 미입력")} · ${escapeHtml(s.structure||"형식 미지정")}</div><div class="tagline">${tags(s.keywords).slice(0,4).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div></div>`; item.addEventListener("click",()=>{ if(current()) saveCurrent({silent:true}); state.currentId=s.id; saveLocal(); renderEditor(); showTab("basic"); setMobilePanel("edit"); }); els.sermonList.appendChild(item); }); els.listCount.textContent=arr.length; els.countPill.textContent=`${sermonsArray(false).length}편 · ${state.room}`; }
     function renderStats(){ const arr=sermonsArray(false); const feedbackCount=arr.reduce((n,s)=>n+(s.feedbacks?.length||0),0); const todoCount=arr.reduce((n,s)=>n+(s.todos||[]).filter(t=>!t.done).length,0); const manuscriptCount=arr.filter(s=>(s.manuscript||"").trim()).length; const quizCount=arr.reduce((n,s)=>n+(s.quizzes?.length||0),0); els.statsBox.innerHTML=`<div class="stat"><b>${arr.length}</b><span>설교 기록</span></div><div class="stat"><b>${feedbackCount}</b><span>피드백</span></div><div class="stat"><b>${todoCount}</b><span>미완료 할 일</span></div><div class="stat"><b>${quizCount}</b><span>퀴즈</span></div>`; }
     function sortArray(arr,mode){ return [...arr].sort((a,b)=>{ if(mode==="dateAsc") return String(a.sermonDate||"").localeCompare(String(b.sermonDate||"")); if(mode==="updatedDesc") return String(b.updatedAtClient||"").localeCompare(String(a.updatedAtClient||"")); if(mode==="titleAsc") return String(a.title||"").localeCompare(String(b.title||""),"ko"); return String(b.sermonDate||"").localeCompare(String(a.sermonDate||"")); }); }
@@ -643,7 +657,7 @@ service cloud.firestore {
     async function copyPreview(){ const cur=collectCurrent(); const text=[cur.title||"제목 없음", `날짜: ${formatDate(cur.sermonDate||nextSunday())}`, `본문: ${cur.passage||"본문 미입력"}`, `형식: ${cur.structure||""}`, cur.theme?`주제: ${cur.theme}`:"", cur.onePoint?`핵심: ${cur.onePoint}`:"", "", cur.manuscript||"원고 미작성"].filter(v=>v!=="").join("\n"); await copyTextWithToast(text,"전체 미리보기를 복사했습니다"); }
     async function printCurrent(){ clearTimeout(saveTimer); if(!current()) return alert("인쇄할 설교가 없습니다."); await saveCurrent({silent:true}); const cur=current(); if(!cur) return alert("인쇄할 설교가 없습니다."); els.printSheet.innerHTML=`<h1>${escapeHtml(cur.title||"제목 없음")}</h1><div class="print-meta">날짜: ${escapeHtml(formatDate(cur.sermonDate||nextSunday()))}<br>본문: ${escapeHtml(cur.passage||"본문 미입력")}<br>형식: ${escapeHtml(cur.structure||"")}<br>주제: ${escapeHtml(cur.theme||"")}<br>핵심: ${escapeHtml(cur.onePoint||"")}</div><div class="print-content">${escapeHtml(cur.manuscript||"")}</div><div class="print-footer">설교일지 · ${escapeHtml(state.room)}</div>`; requestAnimationFrame(()=>setTimeout(()=>window.print(),80)); }
 
-    function addTodoFromForm(){ const text=els.todoText.value.trim(); if(!text) return; addTodo(text,els.todoDue.value || nextSunday(),els.todoType.value,els.todoImportant.checked); els.todoText.value=""; els.todoDue.value=nextSunday(); els.todoImportant.checked=false; showTab("tasks"); }
+    function addTodoFromForm(){ const text=els.todoText.value.trim(); if(!text) return; addTodo(text,els.todoDue.value || nextSunday(),els.todoType.value,els.todoImportant.checked); els.todoText.value=""; setDateControl(els.todoDue, els.todoDueText, nextSunday()); els.todoImportant.checked=false; showTab("tasks"); }
     function addTodo(text,due="",type="준비",important=false){ if(!due) due=nextSunday(); const cur=currentOrCreate(); cur.todos=cur.todos||[]; cur.todos.unshift({id:uid(),text,due,type,important:!!important,done:false,createdAt:new Date().toISOString(),doneAt:""}); persistSermon(cur); }
     function renderTodos(){
       const cur=current(); if(!cur){ els.todoList.innerHTML=""; return; }
@@ -685,42 +699,112 @@ service cloud.firestore {
     function feedbackCard(f,sermon,compact=true){ const card=document.createElement("div"); card.className="feedback-card"; card.innerHTML=`<div class="feedback-top"><div><div class="feedback-title">${escapeHtml(f.topic||f.category||"피드백")}</div><div class="tagline"><span class="chip">${escapeHtml(f.category||"기타")}</span><span class="chip">${escapeHtml(f.status||"검토중")}</span>${f.source?`<span class="chip">${escapeHtml(f.source)}</span>`:""}</div></div><button class="btn small secondary" data-del>삭제</button></div><div class="feedback-text">${escapeHtml(f.text||"")}</div>${f.action?`<div class="feedback-reflect"><label>다음 반영</label><div class="feedback-text">${escapeHtml(f.action)}</div></div>`:""}${compact?`<div class="hint" style="margin-top:8px">${escapeHtml(formatDate(sermon.sermonDate||nextSunday()))} · ${escapeHtml(sermon.title||"제목 없음")}</div>`:""}<div class="feedback-reflect"><label>피드백에 대한 피드백 / 실제 반영 결과</label><textarea data-reflect placeholder="반영해보니 어땠는지, 다음에 더 조정할 점을 적어보세요.">${escapeHtml(f.reflection||"")}</textarea></div>`; card.querySelector("[data-reflect]").addEventListener("input",e=>{ f.reflection=e.target.value; sermon.updatedAtClient=new Date().toISOString(); state.sermons[sermon.id]=sermon; debounceRemoteSave(sermon); }); card.querySelector("[data-del]").addEventListener("click",()=>{ if(!confirm("이 피드백을 삭제할까요?")) return; sermon.feedbacks=(sermon.feedbacks||[]).filter(x=>x.id!==f.id); persistSermon(sermon); }); return card; }
     function renderGlobalFeedback(){ const filter=els.globalFeedbackFilter.value; const query=(els.globalFeedbackSearch.value||"").toLowerCase().trim(); const all=[]; sermonsArray(false).forEach(s=>(s.feedbacks||[]).forEach(f=>{ const hay=[f.category,f.topic,f.source,f.status,f.text,f.action,f.reflection,s.title,s.passage].join(" ").toLowerCase(); if((!filter||f.category===filter) && (!query||hay.includes(query))) all.push({sermon:s,feedback:f}); })); all.sort((a,b)=>String(b.feedback.createdAt||"").localeCompare(String(a.feedback.createdAt||""))); if(!all.length){ els.globalFeedbackBoard.innerHTML=`<div class="empty">모아볼 피드백이 없습니다.</div>`; return; } const groups={}; all.forEach(x=>{ const key=x.feedback.topic||x.feedback.category||"기타"; (groups[key] ||= []).push(x); }); els.globalFeedbackBoard.innerHTML=""; Object.entries(groups).forEach(([topic,items])=>{ const wrap=document.createElement("details"); wrap.open=true; wrap.innerHTML=`<summary>${escapeHtml(topic)} <span class="hint">${items.length}개</span></summary><div></div>`; const box=wrap.querySelector("div"); items.forEach(({sermon,feedback})=>box.appendChild(feedbackCard(feedback,sermon,true))); els.globalFeedbackBoard.appendChild(wrap); }); }
 
+    function renderChoiceInputs(values=[]){
+      if(!els.quizChoiceInputs) return;
+      const count=Math.max(2, Math.min(5, Number(els.quizChoiceCount?.value || 4)));
+      const prev=[...els.quizChoiceInputs.querySelectorAll("input")].map(i=>i.value);
+      els.quizChoiceInputs.innerHTML="";
+      for(let i=1;i<=count;i++){
+        const label=document.createElement("label"); label.textContent=`${i}번`;
+        const input=document.createElement("input"); input.placeholder=`${i}번 보기 텍스트`;
+        input.value=(values[i-1] ?? prev[i-1] ?? "");
+        input.dataset.choiceIndex=String(i);
+        els.quizChoiceInputs.appendChild(label);
+        els.quizChoiceInputs.appendChild(input);
+      }
+    }
+    function updateQuizFormatUI(){
+      const isChoice=(els.quizFormat?.value || "") === "객관식";
+      if(els.quizChoicePanel) els.quizChoicePanel.hidden=!isChoice;
+      if(isChoice && els.quizChoiceInputs && !els.quizChoiceInputs.children.length) renderChoiceInputs();
+    }
+    function choiceValuesFromOptions(text){
+      return String(text||"").split(/\n+/).map(x=>x.replace(/^\s*\d+\s*[).번:-]?\s*/,"").trim()).filter(Boolean);
+    }
+    function getQuizOptionsFromForm(){
+      if((els.quizFormat?.value || "") === "객관식"){
+        const lines=[...els.quizChoiceInputs.querySelectorAll("input")].map((input,i)=>input.value.trim()?`${i+1}. ${input.value.trim()}`:"").filter(Boolean);
+        return lines.join("\n");
+      }
+      return els.quizOptions?.value.trim() || "";
+    }
     function quizFormData(){
       return {
         date: els.quizDate?.value || nextSunday(),
         target: els.quizTarget?.value || "유치부",
         format: els.quizFormat?.value || "OX",
+        passage: els.quizPassage?.value.trim() || "",
         question: els.quizQuestion?.value.trim() || "",
-        options: els.quizOptions?.value.trim() || "",
+        options: getQuizOptionsFromForm(),
         answer: els.quizAnswer?.value.trim() || "",
+        explanation: els.quizExplanation?.value.trim() || "",
         feedback: els.quizFeedback?.value.trim() || "",
         pptNote: els.quizPptNote?.value.trim() || ""
       };
     }
-    function clearQuizForm(){ if(els.quizQuestion) els.quizQuestion.value=""; if(els.quizOptions) els.quizOptions.value=""; if(els.quizAnswer) els.quizAnswer.value=""; if(els.quizFeedback) els.quizFeedback.value=""; if(els.quizPptNote) els.quizPptNote.value=""; if(els.quizDate) els.quizDate.value=current()?.sermonDate || nextSunday(); }
+    function clearQuizForm(){
+      if(els.quizPassage) els.quizPassage.value="";
+      if(els.quizQuestion) els.quizQuestion.value="";
+      if(els.quizOptions) els.quizOptions.value="";
+      if(els.quizAnswer) els.quizAnswer.value="";
+      if(els.quizExplanation) els.quizExplanation.value="";
+      if(els.quizFeedback) els.quizFeedback.value="";
+      if(els.quizPptNote) els.quizPptNote.value="";
+      setDateControl(els.quizDate, els.quizDateText, current()?.sermonDate || nextSunday());
+      renderChoiceInputs([]);
+      updateQuizFormatUI();
+    }
+    function fillQuizForm(z){
+      if(!z) return;
+      setDateControl(els.quizDate, els.quizDateText, z.date || current()?.sermonDate || nextSunday());
+      if(els.quizTarget) els.quizTarget.value=z.target || "유치부";
+      if(els.quizFormat) els.quizFormat.value=z.format || "OX";
+      if(els.quizPassage) els.quizPassage.value=z.passage || "";
+      if(els.quizQuestion) els.quizQuestion.value=z.question || "";
+      if(els.quizOptions) els.quizOptions.value=z.options || "";
+      if(els.quizAnswer) els.quizAnswer.value=z.answer || "";
+      if(els.quizExplanation) els.quizExplanation.value=z.explanation || "";
+      if(els.quizFeedback) els.quizFeedback.value=z.feedback || "";
+      if(els.quizPptNote) els.quizPptNote.value=z.pptNote || "";
+      updateQuizFormatUI();
+      if((z.format || "") === "객관식"){
+        const vals=choiceValuesFromOptions(z.options || "");
+        if(els.quizChoiceCount) els.quizChoiceCount.value=String(Math.min(5, Math.max(2, vals.length || 4)));
+        renderChoiceInputs(vals);
+      }
+      showTab("quiz");
+      window.scrollTo?.({top:0, behavior:"smooth"});
+      setStatus("퀴즈를 입력창으로 불러왔습니다", "ok");
+    }
     function addQuizFromForm(){ const data=quizFormData(); if(!data.question) return alert("퀴즈 문제를 입력해주세요."); const cur=currentOrCreate(); cur.quizzes=Array.isArray(cur.quizzes)?cur.quizzes:[]; cur.quizzes.unshift({id:uid(), createdAt:new Date().toISOString(), updatedAtClient:new Date().toISOString(), ...data}); persistSermon(cur); clearQuizForm(); showTab("quiz"); }
     function renderQuizzes(){
       if(!els.quizList) return;
       const cur=current(); if(!cur){ els.quizList.innerHTML=""; return; }
       cur.quizzes=Array.isArray(cur.quizzes)?cur.quizzes:[];
-      if(els.quizDate && !els.quizDate.value) els.quizDate.value=cur.sermonDate || nextSunday();
+      if(els.quizDate && !els.quizDate.value) setDateControl(els.quizDate, els.quizDateText, cur.sermonDate || nextSunday());
+      updateQuizFormatUI();
       const q=(els.quizSearch?.value||"").toLowerCase().trim();
       const target=els.quizTargetFilter?.value||"";
       let list=[...cur.quizzes].filter(x=>{
-        const hay=[x.date,x.target,x.format,x.question,x.options,x.answer,x.feedback,x.pptNote].join(" ").toLowerCase();
+        const hay=[x.date,x.target,x.format,x.passage,x.question,x.options,x.answer,x.explanation,x.feedback,x.pptNote].join(" ").toLowerCase();
         return (!target || x.target===target) && (!q || hay.includes(q));
       });
       list.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")) || String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
       els.quizList.innerHTML=list.length?"":`<div class="empty">기록된 퀴즈가 없습니다.</div>`;
       list.forEach((z,idx)=>{
-        const card=document.createElement("div"); card.className="quiz-card";
-        card.innerHTML=`<div class="quiz-badges"><span class="chip">${escapeHtml(formatDate(z.date||nextSunday()))}</span><span class="chip">${escapeHtml(z.target||"")}</span><span class="chip">${escapeHtml(z.format||"")}</span></div><h4>Q${idx+1}. ${escapeHtml(z.question||"문제 없음")}</h4>${z.options?`<div class="quiz-options"><b>보기/힌트</b><br>${escapeHtml(z.options)}</div>`:""}${z.answer?`<div class="quiz-answer"><b>정답</b><br>${escapeHtml(z.answer)}</div>`:""}${z.feedback?`<div class="quiz-feedback"><b>피드백</b><br>${escapeHtml(z.feedback)}</div>`:""}${z.pptNote?`<div class="quiz-options"><b>PPT 메모</b><br>${escapeHtml(z.pptNote)}</div>`:""}<div class="toolbar compact" style="margin-top:10px"><button class="btn small secondary" data-copy>복사</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-img>이미지</button><button class="btn small secondary" data-del>삭제</button></div>`;
+        const card=document.createElement("div"); card.className="quiz-card"; card.title="클릭하면 이 퀴즈를 입력창으로 불러옵니다.";
+        card.innerHTML=`<div class="quiz-badges"><span class="chip">${escapeHtml(formatDate(z.date||nextSunday()))}</span><span class="chip">${escapeHtml(z.target||"")}</span><span class="chip">${escapeHtml(z.format||"")}</span>${z.passage?`<span class="chip">${escapeHtml(z.passage)}</span>`:""}</div><h4>Q${idx+1}. ${escapeHtml(z.question||"문제 없음")}</h4>${z.options?`<div class="quiz-options"><b>보기/힌트</b><br>${escapeHtml(z.options)}</div>`:""}${z.answer?`<div class="quiz-answer"><b>정답</b><br>${escapeHtml(z.answer)}</div>`:""}${z.explanation?`<div class="quiz-answer"><b>해설</b><br>${escapeHtml(z.explanation)}</div>`:""}${z.feedback?`<div class="quiz-feedback"><b>피드백</b><br>${escapeHtml(z.feedback)}</div>`:""}${z.pptNote?`<div class="quiz-options"><b>PPT 메모</b><br>${escapeHtml(z.pptNote)}</div>`:""}<div class="toolbar compact" style="margin-top:10px"><button class="btn small secondary" data-copy>복사</button><button class="btn small secondary" data-load>불러오기</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-img>문제이미지</button><button class="btn small secondary" data-answer-img>정답이미지</button><button class="btn small secondary" data-del>삭제</button></div>`;
+        card.addEventListener("click",e=>{ if(e.target.closest("button")) return; fillQuizForm(z); });
         card.querySelector("[data-copy]").addEventListener("click",()=>copyTextWithToast(formatQuizForPpt(z),"퀴즈를 복사했습니다"));
-        card.querySelector("[data-img]").addEventListener("click",()=>downloadQuizImage(z));
+        card.querySelector("[data-load]").addEventListener("click",()=>fillQuizForm(z));
+        card.querySelector("[data-img]").addEventListener("click",()=>downloadQuizImage(z,"question"));
+        card.querySelector("[data-answer-img]").addEventListener("click",()=>downloadQuizImage(z,"answer"));
         card.querySelector("[data-del]").addEventListener("click",()=>{ if(!confirm("이 퀴즈를 삭제할까요?")) return; cur.quizzes=cur.quizzes.filter(x=>x.id!==z.id); persistSermon(cur); });
         card.querySelector("[data-edit]").addEventListener("click",()=>{
+          const passage=prompt("성경구절 수정",z.passage||""); if(passage!==null) z.passage=passage.trim();
           const question=prompt("문제 수정",z.question||""); if(question===null) return; z.question=question.trim();
-          const answer=prompt("정답/해설 수정",z.answer||""); if(answer!==null) z.answer=answer.trim();
+          const answer=prompt("정답 수정",z.answer||""); if(answer!==null) z.answer=answer.trim();
+          const explanation=prompt("해설 수정",z.explanation||""); if(explanation!==null) z.explanation=explanation.trim();
           const feedback=prompt("피드백 수정",z.feedback||""); if(feedback!==null) z.feedback=feedback.trim();
           z.updatedAtClient=new Date().toISOString(); persistSermon(cur);
         });
@@ -728,18 +812,26 @@ service cloud.firestore {
       });
     }
     function formatQuizForPpt(z=quizFormData()){
-      return [`[${z.format||"퀴즈"}] ${formatDate(z.date||nextSunday())} · ${z.target||"대상"}`, `문제: ${z.question||""}`, z.options?`보기/힌트:\n${z.options}`:"", z.answer?`정답:\n${z.answer}`:"", z.feedback?`피드백:\n${z.feedback}`:"", z.pptNote?`PPT 메모:\n${z.pptNote}`:""].filter(Boolean).join("\n\n");
+      return [`[${z.format||"퀴즈"}] ${formatDate(z.date||nextSunday())} · ${z.target||"대상"}`, z.passage?`성경구절: ${z.passage}`:"", `문제: ${z.question||""}`, z.options?`보기/힌트:\n${z.options}`:"", z.answer?`정답:\n${z.answer}`:"", z.explanation?`해설:\n${z.explanation}`:"", z.feedback?`피드백:\n${z.feedback}`:"", z.pptNote?`PPT 메모:\n${z.pptNote}`:""].filter(Boolean).join("\n\n");
     }
     function copyQuizPptText(){ const cur=current(); const list=(cur?.quizzes||[]); const text=list.length ? list.map((z,i)=>`#${i+1}\n${formatQuizForPpt(z)}`).join("\n\n---\n\n") : formatQuizForPpt(quizFormData()); copyTextWithToast(text,"PPT용 퀴즈 텍스트를 복사했습니다"); }
-    function downloadQuizImage(item){
-      const z=item || quizFormData(); if(!z.question) return alert("이미지로 만들 문제를 입력하거나 저장된 퀴즈를 선택하세요.");
+    function downloadQuizImage(item, mode="question"){
+      const z=item || quizFormData();
+      if(mode==="question" && !z.question) return alert("이미지로 만들 문제를 입력하거나 저장된 퀴즈를 선택하세요.");
+      if(mode==="answer" && !(z.answer || z.explanation)) return alert("이미지로 만들 정답 또는 해설을 입력하세요.");
       const canvas=document.createElement("canvas"); canvas.width=1280; canvas.height=720; const ctx=canvas.getContext("2d");
-      ctx.fillStyle="#fffdf8"; ctx.fillRect(0,0,1280,720); ctx.fillStyle="#5d6f4f"; ctx.fillRect(0,0,1280,84);
-      ctx.fillStyle="#fff"; ctx.font="bold 34px sans-serif"; ctx.fillText(`${z.target||""} · ${z.format||"퀴즈"}`,60,54);
-      ctx.fillStyle="#1d211f"; ctx.font="bold 54px sans-serif"; wrapCanvasText(ctx,z.question||"",70,170,1140,68,4);
-      ctx.font="32px sans-serif"; ctx.fillStyle="#4d554d"; if(z.options) wrapCanvasText(ctx,z.options,90,460,1100,42,3);
+      ctx.fillStyle="#fffdf8"; ctx.fillRect(0,0,1280,720); ctx.fillStyle=mode==="answer"?"#8a6b3f":"#5d6f4f"; ctx.fillRect(0,0,1280,84);
+      ctx.fillStyle="#fff"; ctx.font="bold 34px sans-serif"; ctx.fillText(`${z.target||""} · ${z.format||"퀴즈"}${mode==="answer"?" · 정답":""}`,60,54);
+      ctx.fillStyle="#1d211f";
+      if(mode==="answer"){
+        ctx.font="bold 50px sans-serif"; wrapCanvasText(ctx,`정답: ${z.answer||""}`,70,170,1140,62,3);
+        ctx.font="32px sans-serif"; ctx.fillStyle="#4d554d"; if(z.explanation) wrapCanvasText(ctx,z.explanation,90,400,1100,42,5);
+      }else{
+        ctx.font="bold 54px sans-serif"; wrapCanvasText(ctx,z.question||"",70,170,1140,68,4);
+        ctx.font="32px sans-serif"; ctx.fillStyle="#4d554d"; if(z.options) wrapCanvasText(ctx,z.options,90,460,1100,42,3);
+      }
       ctx.font="bold 26px sans-serif"; ctx.fillStyle="#8a6b3f"; ctx.fillText(formatDate(z.date||nextSunday()),70,660);
-      const a=document.createElement("a"); a.href=canvas.toDataURL("image/png"); a.download=`퀴즈_${z.target||"대상"}_${today()}.png`; a.click();
+      const a=document.createElement("a"); a.href=canvas.toDataURL("image/png"); a.download=`퀴즈_${mode==="answer"?"정답":"문제"}_${z.target||"대상"}_${today()}.png`; a.click();
     }
     function wrapCanvasText(ctx,text,x,y,maxWidth,lineHeight,maxLines=5){ const words=String(text||"").replace(/\n/g," \n ").split(/\s+/); let line="", lines=[]; words.forEach(w=>{ if(w==="\n"){ lines.push(line); line=""; return; } const test=line?line+" "+w:w; if(ctx.measureText(test).width>maxWidth && line){ lines.push(line); line=w; } else line=test; }); if(line) lines.push(line); lines.slice(0,maxLines).forEach((ln,i)=>ctx.fillText(ln,x,y+i*lineHeight)); if(lines.length>maxLines) ctx.fillText("…",x,y+maxLines*lineHeight); }
 
@@ -753,21 +845,36 @@ service cloud.firestore {
     function setMobileNavActive(panel){ document.querySelectorAll("#mobileNav button").forEach(b=>b.classList.toggle("active", b.dataset.panel===panel)); }
     function activateTabOnly(name){ document.querySelectorAll("#mainTabs .tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name)); document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.dataset.view===name)); }
 
-    function openDatePicker(){ try{ els.sermonDate.showPicker(); }catch(e){ els.sermonDate.focus(); els.sermonDate.click(); } }
+    function openDatePicker(){ openHiddenDatePicker(els.sermonDate); }
+    function openHiddenDatePicker(input){ if(!input) return; try{ input.showPicker(); }catch(e){ input.focus(); input.click(); } }
+    function setDateControl(input, textInput, value){ if(!input) return; const v=value || input.value || nextSunday(); input.value=v; if(textInput) textInput.value=formatDate(v); }
     function openUpdateLog(){ els.updateNotes.value=state.updateNotes || `${formatDate(today())}\n- `; els.updateSavedAt.textContent=state.updateSavedAt?`마지막 저장: ${formatDateTime(state.updateSavedAt)}`:"아직 저장된 업데이트 기록이 없습니다."; els.updateModal.classList.add("open"); setTimeout(()=>{ els.updateNotes.focus(); els.updateNotes.selectionStart=els.updateNotes.selectionEnd=els.updateNotes.value.length; },50); }
     function closeUpdateLog(){ els.updateModal.classList.remove("open"); }
     function appendTodayToUpdateLog(){ const prefix=(els.updateNotes.value.trim()?"\n\n":"")+`${formatDate(today())}\n- `; els.updateNotes.value+=prefix; els.updateNotes.focus(); els.updateNotes.selectionStart=els.updateNotes.selectionEnd=els.updateNotes.value.length; }
     function summarizeUpdateText(text){ const lines=String(text||"").split(/\n+/).map(x=>x.trim()).filter(Boolean); const body=lines.find(x=>!/^\d{4}-\d{2}-\d{2}/.test(x)) || lines[0] || "업데이트 기록"; return body.replace(/^-\s*/,"").slice(0,120); }
     function mergeQuestionBoxes(a=[],b=[]){ const map=new Map(); [...a,...b].forEach(q=>{ if(!q) return; const id=q.id || "box_"+hashText(q.text||""); if(!q.text) return; map.set(id,{...q,id}); }); return [...map.values()]; }
     async function saveSystemDoc(){ saveLocal(); renderUpdatePreview(); renderReflectionBox(); if(state.ready&&db){ try{ await setDoc(doc(db,"rooms",state.room,"sermons",UPDATE_DOC_ID), {systemType:"updateNotes", text:state.updateNotes||"", updatedAtClient:state.updateSavedAt||"", history:state.updateHistory||[], reflectionBox:state.reflectionBox||[], prepQuestionBox:state.prepQuestionBox||[], updatedAt:serverTimestamp()}, {merge:true}); setStatus("동기화됨","ok"); }catch(e){ console.error(e); setStatus("업데이트 동기화 오류","bad"); } } }
-    async function saveUpdateLog(){ state.updateNotes=els.updateNotes.value; state.updateSavedAt=new Date().toISOString(); await saveSystemDoc(); setStatus("업데이트 저장 완료","ok"); closeUpdateLog(); }
+    async function saveUpdateLog(){
+      const text=(els.updateNotes.value||"").trim();
+      if(text){
+        const item={id:uid(),version:(state.updateHistory?.length||0)+1,archivedAt:new Date().toISOString(),summary:summarizeUpdateText(text),text};
+        state.updateHistory=[item,...(state.updateHistory||[])];
+      }
+      state.updateNotes="";
+      state.updateSavedAt=new Date().toISOString();
+      els.updateNotes.value="";
+      await saveSystemDoc();
+      setStatus(text?"업데이트 기록 백업 완료":"업데이트 기록 비움","ok");
+      closeUpdateLog();
+    }
     async function archiveUpdateLog(){ const text=els.updateNotes.value.trim(); if(!text) return alert("백업할 업데이트 기록이 없습니다."); const item={id:uid(),version:(state.updateHistory?.length||0)+1,archivedAt:new Date().toISOString(),summary:summarizeUpdateText(text),text}; state.updateHistory=[item,...(state.updateHistory||[])]; state.updateNotes=""; state.updateSavedAt=new Date().toISOString(); els.updateNotes.value=""; await saveSystemDoc(); setStatus("이전 기록으로 백업 완료","ok"); }
     function renderUpdatePreview(){ const text=(state.updateNotes||"").trim(); els.updatePreview.textContent=text ? text.slice(-620) : "업데이트 버튼으로 기록을 남길 수 있습니다."; const hist=state.updateHistory||[]; if(els.updateHistoryCount) els.updateHistoryCount.textContent=`${hist.length}회`; if(els.updateHistoryList){ els.updateHistoryList.innerHTML=hist.length?"":`<div class="empty">백업된 업데이트 이력이 없습니다.</div>`; hist.forEach(h=>{ const div=document.createElement("div"); div.className="history-item"; div.innerHTML=`<b>v${escapeHtml(h.version||"")} · ${escapeHtml(formatDateTime(h.archivedAt||""))}</b><p>${escapeHtml(h.summary||summarizeUpdateText(h.text||""))}</p><details><summary>전체 내용</summary><div class="hint" style="white-space:pre-wrap">${escapeHtml(h.text||"")}</div></details>`; els.updateHistoryList.appendChild(div); }); } }
     function openHelp(){ els.helpModal.classList.add("open"); }
     function closeHelp(){ els.helpModal.classList.remove("open"); }
     function openExternal(url){ window.open(url, "_blank", "noopener,noreferrer"); }
 
-    function buildBibleSearchUrl(){ const passage=(els.passageInput?.value||current()?.passage||"").trim(); const direct=parseBiblePassageUrl(passage); return direct || (passage ? `${BIBLE_URL}&query=${encodeURIComponent(passage)}` : BIBLE_URL); }
+    function buildBibleSearchUrl(){ return buildBibleSearchUrlFromText(els.passageInput?.value||current()?.passage||""); }
+    function buildBibleSearchUrlFromText(raw){ const passage=String(raw||"").trim(); const direct=parseBiblePassageUrl(passage); return direct || (passage ? `${BIBLE_URL}&query=${encodeURIComponent(passage)}` : BIBLE_URL); }
     function parseBiblePassageUrl(raw){
       const input=String(raw||"").trim().replace(/\s+/g," ");
       if(!input) return "";
