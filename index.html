@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>설교일지 v1.10 · Firestore 동기화</title>
+  <title>설교일지 v1.11 · Firestore 동기화</title>
   <style>
     :root{
       --bg:#f6f4ef;--paper:#fffdf8;--card:#fff;--ink:#1d211f;--muted:#6f746f;--line:#e2ddd2;
@@ -56,7 +56,7 @@
 <body data-mobile-panel="edit">
   <div class="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.10</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
+      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.11</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
       <div class="top-actions">
         <span class="pill"><span id="syncDot" class="dot warn"></span><span id="syncText">연결 준비</span></span>
         <span class="pill hide-mobile" id="countPill">0편</span>
@@ -66,7 +66,7 @@
         <button class="btn small secondary" id="btnGemini" title="Gemini 열기 Ctrl+Y">Gemini</button>
         <button class="btn small secondary" id="btnDict" title="네이버 국어사전 열기 Ctrl+D">사전</button>
         <button class="btn small secondary" id="btnGithub" title="GitHub 편집 열기 Ctrl+E">편집</button>
-        <button class="btn small secondary" id="btnHelp" title="도움말 Shift+?">도움말</button>
+        <button class="btn small secondary" id="btnHelp" title="도움말 Ctrl+?">도움말</button>
         <button class="btn small gold" id="btnUpdateLog">업데이트</button>
         <button class="btn small" id="btnNew">+ 새 설교</button>
         <button class="btn small secondary hide-mobile" id="btnSave">저장</button>
@@ -164,11 +164,11 @@
               <div class="field"><label>해설</label><textarea id="quizExplanation" placeholder="왜 이 답인지, 아이들에게 설명할 핵심 문장을 적어두세요."></textarea></div>
               <div class="field"><label>퀴즈 피드백</label><textarea id="quizFeedback" placeholder="아이들이 어려워했던 점, 다음에는 바꿀 점, PPT에서 보완할 점"></textarea></div>
               <div class="field"><label>PPT 메모</label><textarea id="quizPptNote" placeholder="PPT에 넣을 문구, 그림 아이디어, 애니메이션 순서 등"></textarea></div>
-              <div class="toolbar right"><button class="btn secondary" id="btnCopyQuizPpt">PPT용 텍스트 복사</button><button class="btn secondary" id="btnCopyQuizQuestionImage">문제 이미지 복사</button><button class="btn secondary" id="btnDownloadQuizImage">문제 이미지 저장</button><button class="btn secondary" id="btnDownloadQuizAnswerImage">정답 이미지 저장</button><button class="btn" id="btnAddQuiz">퀴즈 추가</button></div>
+              <div class="toolbar right"><button class="btn secondary" id="btnCopyQuizPpt">PPT용 텍스트 복사</button><button class="btn secondary" id="btnCopyQuizQuestionImage">문제 이미지 복사</button><button class="btn secondary" id="btnDownloadQuizImage">문제 이미지 저장</button><button class="btn secondary" id="btnDownloadQuizFullImage">문제전체 이미지 저장</button><button class="btn secondary" id="btnDownloadQuizAnswerImage">정답 이미지 저장</button><button class="btn" id="btnAddQuiz">퀴즈 추가</button></div>
             </div>
             <div class="inline-search"><input id="quizSearch" placeholder="퀴즈 검색: 날짜, 대상, 형식, 문제, 정답" /><select id="quizTargetFilter"><option value="">전체 대상</option><option>유치부</option><option>유년부</option><option>초등부</option><option>전체</option><option>기타</option></select></div>
             <div id="quizList"></div>
-            <details open><summary>PPT 연동 도움말</summary><div class="hint"><p><b>PPT용 텍스트 복사</b>는 문제·보기·정답·피드백을 슬라이드에 붙여넣기 좋게 정리합니다.</p><p><b>문제 이미지 복사</b>는 현재 작성 중인 문제를 16:9 이미지로 만들어 클립보드에 복사합니다.</p><p><b>16:9 이미지 저장</b>은 현재 입력창에 작성 중인 내용 또는 저장된 퀴즈를 1280×720 PNG로 저장합니다. PPT에 그림으로 바로 삽입할 수 있습니다.</p></div></details>
+            <details open><summary>PPT 연동 도움말</summary><div class="hint"><p><b>PPT용 텍스트 복사</b>는 문제·보기·정답·피드백을 슬라이드에 붙여넣기 좋게 정리합니다.</p><p><b>문제 이미지 복사/저장</b>은 대상·퀴즈형식·질문만 16:9 이미지로 만듭니다.</p><p><b>문제전체 이미지 저장</b>은 질문과 보기/힌트까지 포함해 1280×720 PNG로 저장합니다. 날짜는 이미지에 넣지 않습니다.</p><p><b>정답 이미지 저장</b>은 정답과 해설만 따로 저장합니다.</p></div></details>
           </div>
         </div>
       </section>
@@ -338,6 +338,7 @@ service cloud.firestore {
       $("btnCopyQuizPpt").addEventListener("click", copyQuizPptText);
       $("btnCopyQuizQuestionImage").addEventListener("click", () => copyQuizImage(null, "question"));
       $("btnDownloadQuizImage").addEventListener("click", () => downloadQuizImage(null, "question"));
+      $("btnDownloadQuizFullImage").addEventListener("click", () => downloadQuizImage(null, "full"));
       $("btnDownloadQuizAnswerImage").addEventListener("click", () => downloadQuizImage(null, "answer"));
       els.quizFormat.addEventListener("change", updateQuizFormatUI);
       els.quizChoiceCount.addEventListener("change", () => renderChoiceInputs());
@@ -382,6 +383,7 @@ service cloud.firestore {
       els.globalFeedbackFilter.addEventListener("change", renderGlobalFeedback);
       document.querySelectorAll("#mainTabs .tab").forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)));
       document.querySelectorAll("#mobileNav button").forEach(btn => btn.addEventListener("click", () => setMobilePanel(btn.dataset.panel)));
+      els.statsBox.addEventListener("click", e => { const stat=e.target.closest(".stat[data-go]"); if(stat) goFromStat(stat.dataset.go); });
       document.addEventListener("click", e => { const info=e.target.closest(".info-dot"); if(info){ alert(info.dataset.info || "이 항목의 안내입니다."); } });
 
       const saveInputs = [els.titleInput,els.passageInput,els.passageUrlInput,els.audienceInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput];
@@ -431,7 +433,7 @@ service cloud.firestore {
       unsub = onSnapshot(collection(db,"rooms",state.room,"sermons"), snap => {
         const incoming = {};
         snap.forEach(d => {
-          if(d.id === UPDATE_DOC_ID){ const data=d.data()||{}; state.updateNotes=data.text||""; state.updateSavedAt=data.updatedAtClient||""; state.updateHistory=Array.isArray(data.history)?data.history:state.updateHistory; state.reflectionBox=mergeQuestionBoxes(state.reflectionBox, data.reflectionBox||[]); state.prepQuestionBox=mergeQuestionBoxes(state.prepQuestionBox, data.prepQuestionBox||[]); return; }
+          if(d.id === UPDATE_DOC_ID){ const data=d.data()||{}; state.updateNotes=data.text||""; state.updateSavedAt=data.updatedAtClient||""; state.updateHistory=mergeUpdateHistories(state.updateHistory, data.history||[]); state.reflectionBox=mergeQuestionBoxes(state.reflectionBox, data.reflectionBox||[]); state.prepQuestionBox=mergeQuestionBoxes(state.prepQuestionBox, data.prepQuestionBox||[]); return; }
           const data = d.data()||{};
           if(data.deleted || state.deletedIds.has(d.id)) return;
           const remote = normalizeSermon({ id:d.id, ...data });
@@ -529,16 +531,33 @@ service cloud.firestore {
       try{
         const raw=localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
         if(raw){ const parsed=JSON.parse(raw); if(parsed?.sermons){ state.sermons={}; Object.entries(parsed.sermons).forEach(([id,s])=>{ state.sermons[id]=normalizeSermon(s); }); } if(parsed?.currentId) state.currentId=parsed.currentId; if(parsed?.room && !localStorage.getItem(ROOM_KEY)) state.room=parsed.room; if(parsed?.updateNotes) state.updateNotes=parsed.updateNotes; if(parsed?.updateSavedAt) state.updateSavedAt=parsed.updateSavedAt; if(Array.isArray(parsed?.updateHistory)) state.updateHistory=parsed.updateHistory; if(Array.isArray(parsed?.reflectionBox)) state.reflectionBox=parsed.reflectionBox; if(Array.isArray(parsed?.prepQuestionBox)) state.prepQuestionBox=parsed.prepQuestionBox; if(Array.isArray(parsed?.deletedIds)) state.deletedIds=new Set(parsed.deletedIds); }
+        state.updateHistory=mergeUpdateHistories(state.updateHistory, recoverUpdateHistoriesFromLocalStorage());
       }catch(e){ console.warn(e); }
     }
-    function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify({sermons:state.sermons,currentId:state.currentId,room:state.room,updateNotes:state.updateNotes,updateSavedAt:state.updateSavedAt,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,deletedIds:[...state.deletedIds],savedAt:new Date().toISOString()})); }
+    function saveLocal(){ 
+      const payload={sermons:state.sermons,currentId:state.currentId,room:state.room,updateNotes:state.updateNotes,updateSavedAt:state.updateSavedAt,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,deletedIds:[...state.deletedIds],savedAt:new Date().toISOString()};
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      if((state.updateHistory||[]).length) localStorage.setItem(STORAGE_KEY+".updateHistoryBackup", JSON.stringify({updateHistory:state.updateHistory,savedAt:new Date().toISOString()}));
+    }
     function renderAll(skipEditor=false){ renderStats(); renderList(); if(Date.now() > typingRenderHoldUntil) renderGlobalFeedback(); renderUpdatePreview(); renderReflectionBox(); if(!skipEditor) renderEditor(); else renderPreview(); els.roomInput.value=state.room; }
+    function goFromStat(target){
+      if(target==="list"){ setMobilePanel("list"); els.searchInput?.focus(); return; }
+      if(target==="feedback"){ showTab("feedback"); setMobilePanel("edit"); return; }
+      if(target==="tasks"){ showTab("tasks"); setMobilePanel("edit"); return; }
+      if(target==="quiz"){ showTab("quiz"); setMobilePanel("edit"); return; }
+    }
+    function cycleTab(delta){
+      const tabs=[...document.querySelectorAll("#mainTabs .tab")];
+      const activeIndex=Math.max(0,tabs.findIndex(b=>b.classList.contains("active")));
+      const next=(activeIndex+delta+tabs.length)%tabs.length;
+      showTab(tabs[next].dataset.tab);
+    }
     function renderEditorPieces(){ renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); renderGlobalFeedback(); renderStats(); renderList(); renderPreview(); }
 
     function renderEditor(){ const cur=current(); if(!cur){ clearEditor(); return; } ensurePrepQuestions(cur); ensureReflectionQuestions(cur); els.sermonDate.value=cur.sermonDate || nextSunday(); els.sermonDateText.value=formatDate(els.sermonDate.value); els.structureSelect.value=cur.structure || "서론-본론-결론"; els.titleInput.value=cur.title||""; els.passageInput.value=cur.passage||""; els.passageUrlInput.value=cur.passageUrl||""; els.audienceInput.value=cur.audience||"주일학교예배"; els.keywordsInput.value=cur.keywords||""; els.themeInput.value=cur.theme||""; els.onePointInput.value=cur.onePoint||""; els.purposeInput.value=cur.purpose||""; els.textNoteInput.value=cur.textNote||""; els.summaryInput.value=cur.summary||""; els.manuscriptInput.value=cur.manuscript||""; applyStructureGuide(); refreshBasicPlaceholders(); renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); if(els.todoDue && !els.todoDue.value) setDateControl(els.todoDue, els.todoDueText, nextSunday()); if(els.quizDate && !els.quizDate.value) setDateControl(els.quizDate, els.quizDateText, cur.sermonDate || nextSunday()); updateQuizFormatUI(); renderPreview(); renderList(); }
     function clearEditor(){ [els.titleInput,els.passageInput,els.passageUrlInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput].forEach(e=>e.value=""); els.audienceInput.value="주일학교예배"; const d=nextSunday(); els.sermonDate.value=d; els.sermonDateText.value=formatDate(d); els.questionList.innerHTML=`<div class="empty">새 설교를 누르거나 내용을 입력하면 준비질문을 사용할 수 있습니다.</div>`; els.questionBankList.innerHTML=""; els.reflectionList.innerHTML=""; els.todoList.innerHTML=""; els.feedbackList.innerHTML=""; if(els.quizList) els.quizList.innerHTML=""; setDateControl(els.todoDue, els.todoDueText, nextSunday()); setDateControl(els.quizDate, els.quizDateText, nextSunday()); renderPreview(); }
     function renderList(){ const q=(els.searchInput.value||"").toLowerCase().trim(); const fs=els.filterStructure.value; let arr=sermonsArray(true); if(q) arr=arr.filter(s=>[s.title,s.passage,s.keywords,s.theme,s.onePoint,s.summary,s.audience].join(" ").toLowerCase().includes(q)); if(fs) arr=arr.filter(s=>(s.structure||"")===fs); arr=sortArray(arr,els.sortMode.value); els.sermonList.innerHTML=arr.length?"":`<div class="empty">검색 결과가 없습니다.<br>+ 새 설교를 눌러 기록을 시작하세요.</div>`; arr.forEach(s=>{ const item=document.createElement("button"); item.className="sermon-item"+(s.id===state.currentId?" active":""); item.innerHTML=`<div class="sermon-date">${escapeHtml(formatDate(s.sermonDate||nextSunday()))}</div><div style="min-width:0;flex:1;text-align:left"><div class="sermon-title">${escapeHtml(s.title||"제목 없음")}</div><div class="sermon-meta">${escapeHtml(s.passage||"본문 미입력")} · ${escapeHtml(s.structure||"형식 미지정")}</div><div class="tagline">${tags(s.keywords).slice(0,4).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div></div>`; item.addEventListener("click",()=>{ if(current()) saveCurrent({silent:true}); state.currentId=s.id; saveLocal(); renderEditor(); showTab("basic"); setMobilePanel("edit"); }); els.sermonList.appendChild(item); }); els.listCount.textContent=arr.length; els.countPill.textContent=`${sermonsArray(false).length}편 · ${state.room}`; }
-    function renderStats(){ const arr=sermonsArray(false); const feedbackCount=arr.reduce((n,s)=>n+(s.feedbacks?.length||0),0); const todoCount=arr.reduce((n,s)=>n+(s.todos||[]).filter(t=>!t.done).length,0); const manuscriptCount=arr.filter(s=>(s.manuscript||"").trim()).length; const quizCount=arr.reduce((n,s)=>n+(s.quizzes?.length||0),0); els.statsBox.innerHTML=`<div class="stat"><b>${arr.length}</b><span>설교 기록</span></div><div class="stat"><b>${feedbackCount}</b><span>피드백</span></div><div class="stat"><b>${todoCount}</b><span>미완료 할 일</span></div><div class="stat"><b>${quizCount}</b><span>퀴즈</span></div>`; }
+    function renderStats(){ const arr=sermonsArray(false); const feedbackCount=arr.reduce((n,s)=>n+(s.feedbacks?.length||0),0); const todoCount=arr.reduce((n,s)=>n+(s.todos||[]).filter(t=>!t.done).length,0); const quizCount=arr.reduce((n,s)=>n+(s.quizzes?.length||0),0); els.statsBox.innerHTML=`<div class="stat" data-go="list" title="설교 목록으로 이동"><b>${arr.length}</b><span>설교 기록</span></div><div class="stat" data-go="feedback" title="피드백 탭으로 이동"><b>${feedbackCount}</b><span>피드백</span></div><div class="stat" data-go="tasks" title="할 일 탭으로 이동"><b>${todoCount}</b><span>미완료 할 일</span></div><div class="stat" data-go="quiz" title="퀴즈 탭으로 이동"><b>${quizCount}</b><span>퀴즈</span></div>`; }
     function sortArray(arr,mode){ return [...arr].sort((a,b)=>{ if(mode==="dateAsc") return String(a.sermonDate||"").localeCompare(String(b.sermonDate||"")); if(mode==="updatedDesc") return String(b.updatedAtClient||"").localeCompare(String(a.updatedAtClient||"")); if(mode==="titleAsc") return String(a.title||"").localeCompare(String(b.title||""),"ko"); return String(b.sermonDate||"").localeCompare(String(a.sermonDate||"")); }); }
 
     function makeQuestion(text, category="기본"){ return {id:"q_"+hashText(text), text, category, pinned:false, order:0, createdAt:"", updatedAt:""}; }
@@ -794,12 +813,13 @@ service cloud.firestore {
       els.quizList.innerHTML=list.length?"":`<div class="empty">기록된 퀴즈가 없습니다.</div>`;
       list.forEach((z,idx)=>{
         const card=document.createElement("div"); card.className="quiz-card"; card.title="클릭하면 이 퀴즈를 입력창으로 불러옵니다.";
-        card.innerHTML=`<div class="quiz-badges"><span class="chip">${escapeHtml(formatDate(z.date||nextSunday()))}</span><span class="chip">${escapeHtml(z.target||"")}</span><span class="chip">${escapeHtml(z.format||"")}</span>${z.passage?`<span class="chip">${escapeHtml(z.passage)}</span>`:""}</div><h4>Q${idx+1}. ${escapeHtml(z.question||"문제 없음")}</h4>${z.options?`<div class="quiz-options"><b>보기/힌트</b><br>${escapeHtml(z.options)}</div>`:""}${z.answer?`<div class="quiz-answer"><b>정답</b><br>${escapeHtml(z.answer)}</div>`:""}${z.explanation?`<div class="quiz-answer"><b>해설</b><br>${escapeHtml(z.explanation)}</div>`:""}${z.feedback?`<div class="quiz-feedback"><b>피드백</b><br>${escapeHtml(z.feedback)}</div>`:""}${z.pptNote?`<div class="quiz-options"><b>PPT 메모</b><br>${escapeHtml(z.pptNote)}</div>`:""}<div class="toolbar compact" style="margin-top:10px"><button class="btn small secondary" data-copy>복사</button><button class="btn small secondary" data-load>불러오기</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-copyimg>문제복사</button><button class="btn small secondary" data-img>문제이미지</button><button class="btn small secondary" data-answer-img>정답이미지</button><button class="btn small secondary" data-del>삭제</button></div>`;
+        card.innerHTML=`<div class="quiz-badges"><span class="chip">${escapeHtml(formatDate(z.date||nextSunday()))}</span><span class="chip">${escapeHtml(z.target||"")}</span><span class="chip">${escapeHtml(z.format||"")}</span>${z.passage?`<span class="chip">${escapeHtml(z.passage)}</span>`:""}</div><h4>Q${idx+1}. ${escapeHtml(z.question||"문제 없음")}</h4>${z.options?`<div class="quiz-options"><b>보기/힌트</b><br>${escapeHtml(z.options)}</div>`:""}${z.answer?`<div class="quiz-answer"><b>정답</b><br>${escapeHtml(z.answer)}</div>`:""}${z.explanation?`<div class="quiz-answer"><b>해설</b><br>${escapeHtml(z.explanation)}</div>`:""}${z.feedback?`<div class="quiz-feedback"><b>피드백</b><br>${escapeHtml(z.feedback)}</div>`:""}${z.pptNote?`<div class="quiz-options"><b>PPT 메모</b><br>${escapeHtml(z.pptNote)}</div>`:""}<div class="toolbar compact" style="margin-top:10px"><button class="btn small secondary" data-copy>복사</button><button class="btn small secondary" data-load>불러오기</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-copyimg>문제복사</button><button class="btn small secondary" data-img>문제이미지</button><button class="btn small secondary" data-full-img>문제전체</button><button class="btn small secondary" data-answer-img>정답이미지</button><button class="btn small secondary" data-del>삭제</button></div>`;
         card.addEventListener("click",e=>{ if(e.target.closest("button")) return; fillQuizForm(z); });
         card.querySelector("[data-copy]").addEventListener("click",()=>copyTextWithToast(formatQuizForPpt(z),"퀴즈를 복사했습니다"));
         card.querySelector("[data-load]").addEventListener("click",()=>fillQuizForm(z));
         card.querySelector("[data-copyimg]").addEventListener("click",()=>copyQuizImage(z,"question"));
         card.querySelector("[data-img]").addEventListener("click",()=>downloadQuizImage(z,"question"));
+        card.querySelector("[data-full-img]").addEventListener("click",()=>downloadQuizImage(z,"full"));
         card.querySelector("[data-answer-img]").addEventListener("click",()=>downloadQuizImage(z,"answer"));
         card.querySelector("[data-del]").addEventListener("click",()=>{ if(!confirm("이 퀴즈를 삭제할까요?")) return; cur.quizzes=cur.quizzes.filter(x=>x.id!==z.id); persistSermon(cur); });
         card.querySelector("[data-edit]").addEventListener("click",()=>{
@@ -858,18 +878,21 @@ service cloud.firestore {
     async function saveSystemDoc(){ saveLocal(); renderUpdatePreview(); renderReflectionBox(); if(state.ready&&db){ try{ await setDoc(doc(db,"rooms",state.room,"sermons",UPDATE_DOC_ID), {systemType:"updateNotes", text:state.updateNotes||"", updatedAtClient:state.updateSavedAt||"", history:state.updateHistory||[], reflectionBox:state.reflectionBox||[], prepQuestionBox:state.prepQuestionBox||[], updatedAt:serverTimestamp()}, {merge:true}); setStatus("동기화됨","ok"); }catch(e){ console.error(e); setStatus("업데이트 동기화 오류","bad"); } } }
     async function saveUpdateLog(){
       const text=(els.updateNotes.value||"").trim();
+      state.updateHistory=mergeUpdateHistories(state.updateHistory, recoverUpdateHistoriesFromLocalStorage());
       if(text){
         const item={id:uid(),version:(state.updateHistory?.length||0)+1,archivedAt:new Date().toISOString(),summary:summarizeUpdateText(text),text};
-        state.updateHistory=[item,...(state.updateHistory||[])];
+        state.updateHistory=mergeUpdateHistories([item], state.updateHistory);
       }
       state.updateNotes="";
       state.updateSavedAt=new Date().toISOString();
       els.updateNotes.value="";
+      els.updateSavedAt.textContent=text ? "저장 완료: 현재 메모는 비우고 이전 이력에 백업했습니다." : "저장 완료: 현재 메모가 비어 있습니다.";
       await saveSystemDoc();
+      renderUpdatePreview();
       setStatus(text?"업데이트 기록 백업 완료":"업데이트 기록 비움","ok");
-      closeUpdateLog();
+      // 창은 닫지 않고 비워진 메모장 상태를 유지합니다.
     }
-    async function archiveUpdateLog(){ const text=els.updateNotes.value.trim(); if(!text) return alert("백업할 업데이트 기록이 없습니다."); const item={id:uid(),version:(state.updateHistory?.length||0)+1,archivedAt:new Date().toISOString(),summary:summarizeUpdateText(text),text}; state.updateHistory=[item,...(state.updateHistory||[])]; state.updateNotes=""; state.updateSavedAt=new Date().toISOString(); els.updateNotes.value=""; await saveSystemDoc(); setStatus("이전 기록으로 백업 완료","ok"); }
+    async function archiveUpdateLog(){ const text=els.updateNotes.value.trim(); if(!text) return alert("백업할 업데이트 기록이 없습니다."); state.updateHistory=mergeUpdateHistories(state.updateHistory, recoverUpdateHistoriesFromLocalStorage()); const item={id:uid(),version:(state.updateHistory?.length||0)+1,archivedAt:new Date().toISOString(),summary:summarizeUpdateText(text),text}; state.updateHistory=mergeUpdateHistories([item], state.updateHistory); state.updateNotes=""; state.updateSavedAt=new Date().toISOString(); els.updateNotes.value=""; await saveSystemDoc(); renderUpdatePreview(); setStatus("이전 기록으로 백업 완료","ok"); }
     function renderUpdatePreview(){ const text=(state.updateNotes||"").trim(); els.updatePreview.textContent=text ? text.slice(-620) : "업데이트 버튼으로 기록을 남길 수 있습니다."; const hist=state.updateHistory||[]; if(els.updateHistoryCount) els.updateHistoryCount.textContent=`${hist.length}회`; if(els.updateHistoryList){ els.updateHistoryList.innerHTML=hist.length?"":`<div class="empty">백업된 업데이트 이력이 없습니다.</div>`; hist.forEach(h=>{ const div=document.createElement("div"); div.className="history-item"; div.innerHTML=`<b>v${escapeHtml(h.version||"")} · ${escapeHtml(formatDateTime(h.archivedAt||""))}</b><p>${escapeHtml(h.summary||summarizeUpdateText(h.text||""))}</p><details><summary>전체 내용</summary><div class="hint" style="white-space:pre-wrap">${escapeHtml(h.text||"")}</div></details>`; els.updateHistoryList.appendChild(div); }); } }
     function openHelp(){ els.helpModal.classList.add("open"); }
     function closeHelp(){ els.helpModal.classList.remove("open"); }
@@ -921,7 +944,7 @@ service cloud.firestore {
       else { (e.shiftKey ? textareas[textareas.length-1] : textareas[0])?.focus(); }
     }
 
-    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:10,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
+    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:11,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
     async function importJson(){ const file=els.importFile.files?.[0]; if(!file) return alert("불러올 JSON 파일을 선택하세요."); try{ const data=JSON.parse(await file.text()); const arr=Array.isArray(data)?data:(data.sermons||[]); if(data.updateNotes){ state.updateNotes=data.updateNotes; } if(Array.isArray(data.updateHistory)) state.updateHistory=data.updateHistory; if(Array.isArray(data.reflectionBox)) state.reflectionBox=mergeQuestionBoxes(state.reflectionBox,data.reflectionBox); if(Array.isArray(data.prepQuestionBox)) state.prepQuestionBox=mergeQuestionBoxes(state.prepQuestionBox,data.prepQuestionBox); await saveSystemDoc(); renderUpdatePreview(); renderReflectionBox(); if(!arr.length) return alert("설교일지 데이터가 없습니다."); for(const item of arr){ const id=item.id||uid(); const s=normalizeSermon({...item,id,localOnly:false,updatedAtClient:new Date().toISOString()}); state.sermons[id]=s; await saveSermon(s); } state.currentId=arr[0].id; saveLocal(); renderAll(); alert("백업을 불러왔습니다."); }catch(e){ console.error(e); alert("JSON 파일을 읽지 못했습니다."); } }
 
     function handleShortcuts(e){
@@ -931,6 +954,7 @@ service cloud.firestore {
       const shift=e.shiftKey;
       const alt=e.altKey;
       if(ctrl && shift && (key==="/" || e.key==="?")){ e.__sermonHandled=true; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation?.(); openHelp(); return; }
+      if(ctrl && !shift && !alt && (key==="arrowleft" || key==="arrowright")){ e.__sermonHandled=true; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation?.(); cycleTab(key==="arrowright"?1:-1); return; }
       if(!ctrl && !alt && key==="delete" && !isTypingTarget(e.target)){ e.__sermonHandled=true; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation?.(); deleteCurrent(); return; }
       if(!ctrl) { if(key==="escape"){ els.quickPad.classList.remove("open"); closeUpdateLog(); closeHelp(); els.reflectionAskPanel?.classList.remove("open"); } return; }
       let combo = `${shift?"shift+":""}${alt?"alt+":""}${key}`;
