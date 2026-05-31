@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>설교일지 v1.15 · Firestore 동기화</title>
+  <title>설교일지 v1.16 · Firestore 동기화</title>
   <style>
     :root{
       --bg:#f6f4ef;--paper:#fffdf8;--card:#fff;--ink:#1d211f;--muted:#6f746f;--line:#e2ddd2;
@@ -37,13 +37,14 @@
     details{border:1px solid var(--line);border-radius:14px;background:#fffdf8;margin-bottom:10px;overflow:hidden}summary{cursor:pointer;padding:11px 12px;font-weight:900;color:#394139}details>div{padding:0 12px 12px}.mini-table{width:100%;border-collapse:collapse;font-size:12px}.mini-table th,.mini-table td{border-bottom:1px solid var(--line);padding:7px;text-align:left;vertical-align:top}.mini-table th{color:var(--muted);font-weight:900;background:#fffdf8}
     .quick-toggle{position:fixed;right:18px;bottom:18px;z-index:50;width:58px;height:58px;border-radius:22px;background:var(--accent2);color:#fff;box-shadow:0 18px 36px rgba(76,58,34,.25);font-size:24px;font-weight:900}.quick-pad{position:fixed;right:18px;bottom:86px;z-index:49;width:min(420px,calc(100vw - 28px));background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 22px 60px rgba(43,36,25,.25);overflow:hidden;display:none}.quick-pad.open{display:block}.quick-pad header{padding:12px 14px;background:#fffdf8;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.quick-pad textarea{border:0;border-radius:0;min-height:150px;box-shadow:none}.quick-pad footer{padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);background:#fffdf8}
     .modal-backdrop{position:fixed;inset:0;z-index:80;background:rgba(20,18,14,.38);display:none;align-items:center;justify-content:center;padding:16px}.modal-backdrop.open{display:flex}.modal{width:min(760px,100%);max-height:min(86vh,760px);display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:0 30px 90px rgba(0,0,0,.26);overflow:hidden}.modal header,.modal footer{padding:13px 15px;background:#fffdf8;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.modal footer{border-top:1px solid var(--line);border-bottom:0;justify-content:flex-end}.modal-body{padding:14px;overflow:auto}.modal textarea{min-height:420px;font-family:var(--mono);line-height:1.65;background:#fffefb}.mobile-nav{display:none}.print-only{display:none}
+    .reader-modal{width:min(1100px,100%);height:min(96vh,1000px);max-height:96vh}.reader-body{background:#fffefb;padding:28px;overflow:auto}.reader-sheet{max-width:820px;margin:0 auto;font-family:var(--serif);line-height:1.95;font-size:22px}.reader-sheet h1{font-family:var(--sans);font-size:30px;margin:0 0 12px;text-align:center}.reader-meta{font-family:var(--sans);font-size:14px;color:var(--muted);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:20px;text-align:center}.reader-content{white-space:pre-wrap}.ppt-builder{border:1px solid var(--line);border-radius:16px;background:#fffdf8;padding:12px;margin:12px 0}.ppt-slide-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px;margin-top:8px}.ppt-slide-card b{display:block;margin-bottom:5px}.ppt-slide-card .ppt-content{white-space:pre-wrap;color:var(--muted);font-size:13px;line-height:1.5}
 
     .inline-search{display:flex;gap:8px;align-items:center;margin:8px 0 12px}.inline-search input{flex:1}.small-note{font-size:11px;color:var(--muted)}
     .star-btn{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 8px;color:#8a6b3f;box-shadow:none}.star-btn.on{background:#fff4d8;border-color:#d7b45d;color:#8a5a00;font-weight:900}
     .question-card.done-card,.todo-row.done-card{opacity:.78;background:#f7f6f0}.question-card.pinned-card{border-color:#c8b06a;background:#fffaf0}.question-title-row{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.question-title-row b{line-height:1.45}.resolved-date{font-size:11px;color:var(--ok);font-weight:800;margin-left:6px}.due-badge{display:inline-flex;align-items:center;border-radius:999px;background:#fff3d5;color:#8a5a00;padding:2px 7px;font-size:11px;font-weight:900;margin-left:4px}.bank-list{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff;padding:8px}.bank-item{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start;padding:8px;border-bottom:1px solid #f0ede4}.bank-item:last-child{border-bottom:0}.bank-item input{width:18px;height:18px;accent-color:var(--accent)}.bank-cat{font-size:11px;color:var(--accent2);font-weight:900}.toolbar.compact{gap:5px}.toolbar.compact .btn{padding:5px 7px;font-size:11px}.link-btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.help-grid{display:grid;grid-template-columns:170px 1fr;gap:8px;font-size:13px}.help-grid div{padding:7px;border-bottom:1px solid var(--line)}.help-grid b{font-family:var(--mono)}
     @media (max-width:1180px){.layout{grid-template-columns:290px minmax(0,1fr)}.right-col{grid-column:1 / -1}.right-scroll{max-height:none}.stat-grid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:860px){
-      .topbar{padding:8px 10px;align-items:flex-start}.brand-mark{width:36px;height:36px;border-radius:13px}.brand h1{font-size:16px}.brand p{display:none}.top-actions{gap:6px}.top-actions #btnUpdateLog{order:-2}.top-actions #btnNew{order:-1}.top-actions .pill.hide-mobile,.top-actions .btn.hide-mobile{display:none}.room-box input{width:105px}.layout{display:block;padding:10px 10px 86px}.panel{display:none;margin-bottom:10px;border-radius:18px}.editor-scroll,.right-scroll,.list{max-height:none}.grid2,.grid3,.grid4{grid-template-columns:1fr}.panel-body{padding:12px}.tabs{overflow:auto;flex-wrap:nowrap}.tab{white-space:nowrap}.manuscript{min-height:430px;font-size:16px}.desktop-only{display:none}.mobile-nav{display:grid;position:fixed;left:8px;right:8px;bottom:8px;z-index:40;grid-template-columns:repeat(4,1fr);gap:6px;background:rgba(255,253,248,.92);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:22px;padding:7px;box-shadow:0 12px 34px rgba(44,39,28,.17)}.mobile-nav button{border-radius:16px;background:transparent;color:var(--muted);font-size:12px;font-weight:900;padding:9px 4px}.mobile-nav button.active{background:var(--accent);color:#fff}.quick-toggle{right:14px;bottom:78px;width:54px;height:54px}.quick-pad{right:10px;bottom:140px}.todo-row{grid-template-columns:auto 1fr}.todo-row .toolbar{grid-column:1 / -1;justify-content:flex-end}.modal{max-height:92vh}.modal textarea{min-height:360px}
+      .topbar{padding:8px 10px;align-items:flex-start}.brand-mark{width:36px;height:36px;border-radius:13px}.brand h1{font-size:16px}.brand p{display:none}.top-actions{gap:6px}.top-actions #btnUpdateLog{order:-2}.top-actions #btnNew{order:-1}.top-actions .pill.hide-mobile,.top-actions .btn.hide-mobile{display:none}.room-box input{width:105px}.layout{display:block;padding:10px 10px 86px}.panel{display:none;margin-bottom:10px;border-radius:18px}.editor-scroll,.right-scroll,.list{max-height:none}.grid2,.grid3,.grid4{grid-template-columns:1fr}.panel-body{padding:12px}.tabs{overflow:auto;flex-wrap:nowrap}.tab{white-space:nowrap}.manuscript{min-height:430px;font-size:16px}.desktop-only{display:none}.mobile-nav{display:grid;position:fixed;left:8px;right:8px;bottom:8px;z-index:40;grid-template-columns:repeat(5,1fr);gap:6px;background:rgba(255,253,248,.92);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:22px;padding:7px;box-shadow:0 12px 34px rgba(44,39,28,.17)}.mobile-nav button{border-radius:16px;background:transparent;color:var(--muted);font-size:12px;font-weight:900;padding:9px 4px}.mobile-nav button.active{background:var(--accent);color:#fff}.quick-toggle{right:14px;bottom:78px;width:54px;height:54px}.quick-pad{right:10px;bottom:140px}.todo-row{grid-template-columns:auto 1fr}.todo-row .toolbar{grid-column:1 / -1;justify-content:flex-end}.modal{max-height:92vh}.modal textarea{min-height:360px}
       body[data-mobile-panel="list"] .left-col{display:block}body[data-mobile-panel="edit"] .main-col{display:block}body[data-mobile-panel="right"] .right-col{display:block}
     }
     @media print{ @page{size:A4;margin:18mm 16mm} body{background:#fff;color:#000}.app,.quick-toggle,.quick-pad,.mobile-nav,.modal-backdrop{display:none!important}.print-only{display:block}.print-sheet{font-family:var(--serif);line-height:1.9;font-size:11.5pt}.print-sheet h1{text-align:center;font-size:20pt;margin:0 0 10mm}.print-meta{border-top:1px solid #222;border-bottom:1px solid #222;padding:3mm 0;margin-bottom:7mm;font-family:var(--sans);font-size:10pt}.print-content{white-space:pre-wrap}.print-footer{margin-top:10mm;font-family:var(--sans);font-size:9pt;color:#555;text-align:right} }
@@ -56,7 +57,7 @@
 <body data-mobile-panel="edit">
   <div class="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.15</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
+      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.16</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
       <div class="top-actions">
         <span class="pill"><span id="syncDot" class="dot warn"></span><span id="syncText">연결 준비</span></span>
         <span class="pill hide-mobile" id="countPill">0편</span>
@@ -134,8 +135,10 @@
           </div>
 
           <div class="view" data-view="manuscript">
-            <div class="manuscript-tools"><div class="toolbar"><button class="btn small secondary" id="btnInsertHeadings">형식 제목 넣기</button><button class="btn small secondary" id="btnCopyManuscript">원고 복사</button><button class="btn small secondary" id="btnCopyPreview">전체 미리보기 복사</button><button class="btn small" id="btnPrint">A4 인쇄</button></div><span class="hint" id="wordCount">0자</span></div>
-            <div class="panel-body"><div class="field"><label>설교 원고</label><textarea id="manuscriptInput" class="manuscript" placeholder="여기에 설교원고를 작성하세요. 준비질문 답변을 바탕으로 원고 틀을 자동 삽입할 수 있습니다."></textarea></div><div class="paper-preview"><h3 id="previewTitle">제목 없음</h3><div class="paper-meta" id="previewMeta"></div><div class="paper-content" id="previewContent"></div></div></div>
+            <div class="manuscript-tools"><div class="toolbar"><button class="btn small secondary" id="btnInsertHeadings">형식 제목 넣기</button><button class="btn small secondary" id="btnCopyManuscript">원고 복사</button><button class="btn small secondary" id="btnCopyPreview">전체 미리보기 복사</button><button class="btn small secondary" id="btnOpenReader">전체화면 미리보기</button><button class="btn small" id="btnPrint">A4 인쇄</button></div><span class="hint" id="wordCount">0자</span></div>
+            <div class="panel-body"><div class="field"><label>설교 원고</label><textarea id="manuscriptInput" class="manuscript" placeholder="여기에 설교원고를 작성하세요. 준비질문 답변을 바탕으로 원고 틀을 자동 삽입할 수 있습니다."></textarea></div>
+              <div class="ppt-builder"><div class="section-title">PPT 순서별 원고 구성 <span class="hint">슬라이드 제목과 내용을 따로 관리하고, 원고에 순서대로 붙일 수 있습니다.</span></div><div class="grid2"><input id="pptSlideTitle" placeholder="PPT 제목: 예) 재앙이 무엇일까?" /><textarea id="pptSlideContent" placeholder="PPT 내용 또는 이 슬라이드에서 말할 원고"></textarea></div><div class="toolbar right" style="margin-top:8px"><button class="btn secondary" id="btnCopyPptSlides">PPT 구성 복사</button><button class="btn secondary" id="btnAppendPptSlides">원고에 PPT 순서 삽입</button><button class="btn" id="btnAddPptSlide">PPT 순서 추가</button></div><div id="pptSlideList"></div></div>
+              <div class="paper-preview"><h3 id="previewTitle">제목 없음</h3><div class="paper-meta" id="previewMeta"></div><div class="paper-content" id="previewContent"></div></div></div>
           </div>
 
           <div class="panel-body view" data-view="tasks">
@@ -186,7 +189,7 @@ service cloud.firestore {
       </aside>
     </main>
 
-    <nav class="mobile-nav" id="mobileNav"><button data-panel="list">목록</button><button data-panel="edit" class="active">기록</button><button data-panel="right">피드백</button><button data-panel="manuscript">원고</button></nav>
+    <nav class="mobile-nav" id="mobileNav"><button data-panel="list">목록</button><button data-panel="edit" class="active">기록</button><button data-panel="tasks">할일</button><button data-panel="right">피드백</button><button data-panel="manuscript">원고</button></nav>
   </div>
 
   <button class="quick-toggle" id="quickToggle" title="빠른 메모">✎</button>
@@ -195,7 +198,9 @@ service cloud.firestore {
   <section class="modal-backdrop" id="updateModal" aria-label="업데이트 기록"><div class="modal"><header><div><b>업데이트 기록</b><div class="hint">이전에 적은 내용 아래에 이어서 작성할 수 있습니다.</div></div><button class="btn small secondary" id="btnCloseUpdate">닫기</button></header><div class="modal-body"><textarea id="updateNotes" placeholder="예: 2026-05-30(토)\n- 모바일 하단 탭 전환 개선 필요\n- A4 인쇄 버튼 오류 수정"></textarea><div class="hint" id="updateSavedAt" style="margin-top:8px"></div></div><footer><button class="btn secondary" id="btnAppendToday">오늘 날짜 추가</button><button class="btn secondary" id="btnArchiveUpdate">이전기록으로 백업</button><button class="btn" id="btnSaveUpdate">업데이트 저장</button></footer></div></section>
 
 
-  <section class="modal-backdrop" id="helpModal" aria-label="도움말"><div class="modal"><header><div><b>도움말 · 단축키</b><div class="hint">Ctrl 조합 단축키는 브라우저 기본 동작보다 이 일지 기능이 먼저 작동하도록 처리했습니다.</div></div><button class="btn small secondary" id="btnCloseHelp">닫기</button></header><div class="modal-body">
+    <section class="modal-backdrop" id="manuscriptFullModal" aria-label="원고 전체화면 미리보기"><div class="modal reader-modal"><header><div><b>원고 전체화면 미리보기</b><div class="hint">태블릿에서 설교원고처럼 읽기 좋게 보여줍니다.</div></div><div class="toolbar"><button class="btn small secondary" id="btnReaderSmaller">글자 -</button><button class="btn small secondary" id="btnReaderLarger">글자 +</button><button class="btn small secondary" id="btnCloseReader">닫기</button></div></header><div class="modal-body reader-body"><article class="reader-sheet" id="readerSheet"><h1 id="readerTitle">제목 없음</h1><div class="reader-meta" id="readerMeta"></div><div class="reader-content" id="readerContent"></div></article></div></div></section>
+
+<section class="modal-backdrop" id="helpModal" aria-label="도움말"><div class="modal"><header><div><b>도움말 · 단축키</b><div class="hint">Ctrl 조합 단축키는 브라우저 기본 동작보다 이 일지 기능이 먼저 작동하도록 처리했습니다.</div></div><button class="btn small secondary" id="btnCloseHelp">닫기</button></header><div class="modal-body">
     <div class="help-grid">
       <div><b>Ctrl+Shift+N</b></div><div>새 설교 만들기</div>
       <div><b>Delete</b></div><div>현재 설교 삭제. 단, 입력칸에 커서가 있을 때는 글자 삭제가 우선입니다.</div>
@@ -272,11 +277,11 @@ service cloud.firestore {
       syncDot:$("syncDot"), syncText:$("syncText"), countPill:$("countPill"), roomInput:$("roomInput"), listCount:$("listCount"), sermonList:$("sermonList"), searchInput:$("searchInput"), filterStructure:$("filterStructure"), sortMode:$("sortMode"), statsBox:$("statsBox"),
       sermonDate:$("sermonDate"), sermonDateText:$("sermonDateText"), structureSelect:$("structureSelect"), structureGuide:$("structureGuide"), titleInput:$("titleInput"), passageInput:$("passageInput"), passageUrlInput:$("passageUrlInput"), audienceInput:$("audienceInput"), keywordsInput:$("keywordsInput"), themeInput:$("themeInput"), onePointInput:$("onePointInput"), purposeInput:$("purposeInput"), textNoteInput:$("textNoteInput"), summaryInput:$("summaryInput"),
       prepSearch:$("prepSearch"), questionList:$("questionList"), questionBankCategory:$("questionBankCategory"), questionBankSearch:$("questionBankSearch"), questionBankList:$("questionBankList"), customPrepQuestion:$("customPrepQuestion"),
-      reflectionSearch:$("reflectionSearch"), reflectionAskPanel:$("reflectionAskPanel"), reflectionAskInput:$("reflectionAskInput"), reflectionSort:$("reflectionSort"), reflectionList:$("reflectionList"), customReflectionQuestion:$("customReflectionQuestion"), reflectionBoxList:$("reflectionBoxList"), manuscriptInput:$("manuscriptInput"), previewTitle:$("previewTitle"), previewMeta:$("previewMeta"), previewContent:$("previewContent"), wordCount:$("wordCount"),
+      reflectionSearch:$("reflectionSearch"), reflectionAskPanel:$("reflectionAskPanel"), reflectionAskInput:$("reflectionAskInput"), reflectionSort:$("reflectionSort"), reflectionList:$("reflectionList"), customReflectionQuestion:$("customReflectionQuestion"), reflectionBoxList:$("reflectionBoxList"), manuscriptInput:$("manuscriptInput"), pptSlideTitle:$("pptSlideTitle"), pptSlideContent:$("pptSlideContent"), pptSlideList:$("pptSlideList"), previewTitle:$("previewTitle"), previewMeta:$("previewMeta"), previewContent:$("previewContent"), wordCount:$("wordCount"),
       todoText:$("todoText"), todoDue:$("todoDue"), todoDueText:$("todoDueText"), todoType:$("todoType"), todoImportant:$("todoImportant"), todoSearch:$("todoSearch"), todoList:$("todoList"),
       feedbackCategory:$("feedbackCategory"), feedbackTopic:$("feedbackTopic"), feedbackSource:$("feedbackSource"), feedbackStatus:$("feedbackStatus"), feedbackText:$("feedbackText"), feedbackAction:$("feedbackAction"), feedbackSearch:$("feedbackSearch"), feedbackList:$("feedbackList"), globalFeedbackSearch:$("globalFeedbackSearch"), globalFeedbackFilter:$("globalFeedbackFilter"), globalFeedbackBoard:$("globalFeedbackBoard"),
       quizDate:$("quizDate"), quizDateText:$("quizDateText"), quizTarget:$("quizTarget"), quizFormat:$("quizFormat"), quizPassage:$("quizPassage"), quizQuestion:$("quizQuestion"), quizChoicePanel:$("quizChoicePanel"), quizChoiceCount:$("quizChoiceCount"), quizChoiceInputs:$("quizChoiceInputs"), quizOptions:$("quizOptions"), quizAnswer:$("quizAnswer"), quizExplanation:$("quizExplanation"), quizFeedback:$("quizFeedback"), quizPptNote:$("quizPptNote"), quizImageFontSize:$("quizImageFontSize"), quizSearch:$("quizSearch"), quizTargetFilter:$("quizTargetFilter"), quizList:$("quizList"),
-      quickPad:$("quickPad"), quickMemo:$("quickMemo"), printSheet:$("printSheet"), importFile:$("importFile"), updateModal:$("updateModal"), updateNotes:$("updateNotes"), updateSavedAt:$("updateSavedAt"), updatePreview:$("updatePreview"), updateHistoryList:$("updateHistoryList"), updateHistoryCount:$("updateHistoryCount"), helpModal:$("helpModal"), copyToast:$("copyToast")
+      quickPad:$("quickPad"), quickMemo:$("quickMemo"), printSheet:$("printSheet"), importFile:$("importFile"), updateModal:$("updateModal"), updateNotes:$("updateNotes"), updateSavedAt:$("updateSavedAt"), updatePreview:$("updatePreview"), updateHistoryList:$("updateHistoryList"), updateHistoryCount:$("updateHistoryCount"), manuscriptFullModal:$("manuscriptFullModal"), readerSheet:$("readerSheet"), readerTitle:$("readerTitle"), readerMeta:$("readerMeta"), readerContent:$("readerContent"), helpModal:$("helpModal"), copyToast:$("copyToast")
     };
 
     init();
@@ -333,6 +338,14 @@ service cloud.firestore {
       $("btnInsertHeadings").addEventListener("click", insertHeadings);
       $("btnCopyManuscript").addEventListener("click", copyManuscript);
       $("btnCopyPreview").addEventListener("click", copyPreview);
+      $("btnOpenReader").addEventListener("click", openManuscriptReader);
+      $("btnCloseReader").addEventListener("click", closeManuscriptReader);
+      $("btnReaderSmaller").addEventListener("click", () => adjustReaderFont(-2));
+      $("btnReaderLarger").addEventListener("click", () => adjustReaderFont(2));
+      els.manuscriptFullModal.addEventListener("click", e => { if(e.target === els.manuscriptFullModal) closeManuscriptReader(); });
+      $("btnAddPptSlide").addEventListener("click", addPptSlideFromForm);
+      $("btnAppendPptSlides").addEventListener("click", appendPptSlidesToManuscript);
+      $("btnCopyPptSlides").addEventListener("click", copyPptSlides);
       $("btnAddTodo").addEventListener("click", addTodoFromForm);
       $("btnAddFeedback").addEventListener("click", addFeedbackFromForm);
       $("btnAddQuiz").addEventListener("click", addQuizFromForm);
@@ -364,6 +377,8 @@ service cloud.firestore {
       $("btnArchiveUpdate").addEventListener("click", archiveUpdateLog);
       $("btnAppendToday").addEventListener("click", appendTodayToUpdateLog);
       els.updateModal.addEventListener("click", e => { if(e.target === els.updateModal) closeUpdateLog(); });
+      els.updateNotes.addEventListener("input", () => { state.updateNotes = els.updateNotes.value; state.updateSavedAt = new Date().toISOString(); saveLocal(); renderUpdatePreview(); });
+      els.updateNotes.addEventListener("keydown", e => { if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="s"){ e.preventDefault(); saveUpdateLog(); } });
 
       els.searchInput.addEventListener("input", renderList);
       els.filterStructure.addEventListener("change", renderList);
@@ -463,7 +478,7 @@ service cloud.firestore {
 
     function defaultSermon(){
       const date=nextSunday();
-      const s={ id:uid(), localOnly:true, sermonDate:date, dateDisplay:formatDate(date), title:"", passage:"", passageUrl:"", audience:"주일학교예배", keywords:"", theme:"", structure:"서론-본론-결론", onePoint:"", purpose:"", textNote:"", summary:"", prepQuestions:[], prepAnswers:{}, reflectionQuestions:[], reflectionAnswers:{}, removedPrepQuestionIds:[], removedReflectionQuestionIds:[], manuscript:"", todos:[], feedbacks:[], quizzes:[], createdAtClient:new Date().toISOString(), updatedAtClient:new Date().toISOString() };
+      const s={ id:uid(), localOnly:true, sermonDate:date, dateDisplay:formatDate(date), title:"", passage:"", passageUrl:"", audience:"주일학교예배", keywords:"", theme:"", structure:"서론-본론-결론", onePoint:"", purpose:"", textNote:"", summary:"", prepQuestions:[], prepAnswers:{}, reflectionQuestions:[], reflectionAnswers:{}, removedPrepQuestionIds:[], removedReflectionQuestionIds:[], manuscript:"", pptSlides:[], todos:[], feedbacks:[], quizzes:[], createdAtClient:new Date().toISOString(), updatedAtClient:new Date().toISOString() };
       resetPrepQuestionData(s);
       resetReflectionQuestionData(s);
       return s;
@@ -477,13 +492,14 @@ service cloud.firestore {
       n.todos = Array.isArray(n.todos) ? n.todos : [];
       n.feedbacks = Array.isArray(n.feedbacks) ? n.feedbacks : [];
       n.quizzes = Array.isArray(n.quizzes) ? n.quizzes : [];
+      n.pptSlides = Array.isArray(n.pptSlides) ? n.pptSlides : [];
       if(!Array.isArray(n.prepQuestions) || !n.prepQuestions.length) resetPrepQuestionData(n, false);
       if(!Array.isArray(n.reflectionQuestions) || !n.reflectionQuestions.length) resetReflectionQuestionData(n, false);
       stampQuestionList(n.prepQuestions);
       stampQuestionList(n.reflectionQuestions);
       return n;
     }
-    function hasSermonContent(s){ if(!s) return false; const fields=[s.title,s.passage,s.passageUrl,s.audience,s.keywords,s.theme,s.onePoint,s.purpose,s.textNote,s.summary,s.manuscript]; const hasText=fields.some(v=>String(v||"").trim()); const hasPrep=Object.values(s.prepAnswers||{}).some(v=>typeof v==="string" ? v.trim() : String(v?.answer||"").trim()); const hasReflect=Object.values(s.reflectionAnswers||{}).some(v=>String(v?.answer||"").trim() || v?.resolved); return hasText || hasPrep || hasReflect || (s.todos||[]).length || (s.feedbacks||[]).length || (s.quizzes||[]).length; }
+    function hasSermonContent(s){ if(!s) return false; const fields=[s.title,s.passage,s.passageUrl,s.audience,s.keywords,s.theme,s.onePoint,s.purpose,s.textNote,s.summary,s.manuscript]; const hasText=fields.some(v=>String(v||"").trim()); const hasPrep=Object.values(s.prepAnswers||{}).some(v=>typeof v==="string" ? v.trim() : String(v?.answer||"").trim()); const hasReflect=Object.values(s.reflectionAnswers||{}).some(v=>String(v?.answer||"").trim() || v?.resolved); return hasText || hasPrep || hasReflect || (s.todos||[]).length || (s.feedbacks||[]).length || (s.quizzes||[]).length || (s.pptSlides||[]).length; }
     function sermonsArray(includeCurrentDraft=false){ return Object.values(state.sermons).filter(s => hasSermonContent(s) || (includeCurrentDraft && s.id===state.currentId)); }
     function sortedSermons(){ return sortArray(sermonsArray(false), "dateDesc"); }
     function current(){ return state.sermons[state.currentId] || null; }
@@ -517,7 +533,7 @@ service cloud.firestore {
     function collectCurrent(){
       const cur=currentOrCreate();
       cur.sermonDate=els.sermonDate.value || nextSunday(); cur.dateDisplay=formatDate(cur.sermonDate); cur.structure=els.structureSelect.value || "서론-본론-결론"; cur.title=els.titleInput.value.trim(); cur.passage=els.passageInput.value.trim(); cur.passageUrl=els.passageUrlInput.value.trim(); cur.audience=els.audienceInput.value.trim(); cur.keywords=els.keywordsInput.value.trim(); cur.theme=els.themeInput.value.trim(); cur.onePoint=els.onePointInput.value.trim(); cur.purpose=els.purposeInput.value.trim(); cur.textNote=els.textNoteInput.value.trim(); cur.summary=els.summaryInput.value.trim(); cur.manuscript=els.manuscriptInput.value;
-      cur.prepAnswers=collectPrepAnswers(cur); cur.reflectionAnswers=collectReflectionAnswers(cur); syncPostSermonFeedback(cur); cur.updatedAtClient=new Date().toISOString(); cur.localOnly=!hasSermonContent(cur); state.sermons[cur.id]=cur; return cur;
+      cur.pptSlides = Array.isArray(cur.pptSlides) ? cur.pptSlides : []; cur.prepAnswers=collectPrepAnswers(cur); cur.reflectionAnswers=collectReflectionAnswers(cur); syncPostSermonFeedback(cur); cur.updatedAtClient=new Date().toISOString(); cur.localOnly=!hasSermonContent(cur); state.sermons[cur.id]=cur; return cur;
     }
     function collectPrepAnswers(cur=current()){ const old={...(cur?.prepAnswers||{})}; document.querySelectorAll("[data-prep-key]").forEach(t => { old[t.dataset.prepKey]=t.value; }); return old; }
     function collectReflectionAnswers(cur=current()){ const old={...(cur?.reflectionAnswers||{})}; document.querySelectorAll("[data-reflection-key]").forEach(card => { const key=card.dataset.reflectionKey; old[key]=old[key]||{}; old[key].answer=card.querySelector("textarea")?.value || ""; }); return old; }
@@ -552,10 +568,10 @@ service cloud.firestore {
       const next=(activeIndex+delta+tabs.length)%tabs.length;
       showTab(tabs[next].dataset.tab);
     }
-    function renderEditorPieces(){ renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); renderGlobalFeedback(); renderStats(); renderList(); renderPreview(); }
+    function renderEditorPieces(){ renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); renderPptSlides(); renderGlobalFeedback(); renderStats(); renderList(); renderPreview(); }
 
-    function renderEditor(){ const cur=current(); if(!cur){ clearEditor(); return; } ensurePrepQuestions(cur); ensureReflectionQuestions(cur); els.sermonDate.value=cur.sermonDate || nextSunday(); els.sermonDateText.value=formatDate(els.sermonDate.value); els.structureSelect.value=cur.structure || "서론-본론-결론"; els.titleInput.value=cur.title||""; els.passageInput.value=cur.passage||""; els.passageUrlInput.value=cur.passageUrl||""; els.audienceInput.value=cur.audience||"주일학교예배"; els.keywordsInput.value=cur.keywords||""; els.themeInput.value=cur.theme||""; els.onePointInput.value=cur.onePoint||""; els.purposeInput.value=cur.purpose||""; els.textNoteInput.value=cur.textNote||""; els.summaryInput.value=cur.summary||""; els.manuscriptInput.value=cur.manuscript||""; applyStructureGuide(); refreshBasicPlaceholders(); renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); if(els.todoDue && !els.todoDue.value) setDateControl(els.todoDue, els.todoDueText, nextSunday()); if(els.quizDate && !els.quizDate.value) setDateControl(els.quizDate, els.quizDateText, cur.sermonDate || nextSunday()); updateQuizFormatUI(); renderPreview(); renderList(); }
-    function clearEditor(){ [els.titleInput,els.passageInput,els.passageUrlInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput].forEach(e=>e.value=""); els.audienceInput.value="주일학교예배"; const d=nextSunday(); els.sermonDate.value=d; els.sermonDateText.value=formatDate(d); els.questionList.innerHTML=`<div class="empty">새 설교를 누르거나 내용을 입력하면 준비질문을 사용할 수 있습니다.</div>`; els.questionBankList.innerHTML=""; els.reflectionList.innerHTML=""; els.todoList.innerHTML=""; els.feedbackList.innerHTML=""; if(els.quizList) els.quizList.innerHTML=""; setDateControl(els.todoDue, els.todoDueText, nextSunday()); setDateControl(els.quizDate, els.quizDateText, nextSunday()); renderPreview(); }
+    function renderEditor(){ const cur=current(); if(!cur){ clearEditor(); return; } ensurePrepQuestions(cur); ensureReflectionQuestions(cur); els.sermonDate.value=cur.sermonDate || nextSunday(); els.sermonDateText.value=formatDate(els.sermonDate.value); els.structureSelect.value=cur.structure || "서론-본론-결론"; els.titleInput.value=cur.title||""; els.passageInput.value=cur.passage||""; els.passageUrlInput.value=cur.passageUrl||""; els.audienceInput.value=cur.audience||"주일학교예배"; els.keywordsInput.value=cur.keywords||""; els.themeInput.value=cur.theme||""; els.onePointInput.value=cur.onePoint||""; els.purposeInput.value=cur.purpose||""; els.textNoteInput.value=cur.textNote||""; els.summaryInput.value=cur.summary||""; els.manuscriptInput.value=cur.manuscript||""; applyStructureGuide(); refreshBasicPlaceholders(); renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); renderPptSlides(); if(els.todoDue && !els.todoDue.value) setDateControl(els.todoDue, els.todoDueText, nextSunday()); if(els.quizDate && !els.quizDate.value) setDateControl(els.quizDate, els.quizDateText, cur.sermonDate || nextSunday()); updateQuizFormatUI(); renderPreview(); renderList(); }
+    function clearEditor(){ [els.titleInput,els.passageInput,els.passageUrlInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput].forEach(e=>e.value=""); els.audienceInput.value="주일학교예배"; const d=nextSunday(); els.sermonDate.value=d; els.sermonDateText.value=formatDate(d); els.questionList.innerHTML=`<div class="empty">새 설교를 누르거나 내용을 입력하면 준비질문을 사용할 수 있습니다.</div>`; els.questionBankList.innerHTML=""; els.reflectionList.innerHTML=""; els.todoList.innerHTML=""; els.feedbackList.innerHTML=""; if(els.quizList) els.quizList.innerHTML=""; if(els.pptSlideList) els.pptSlideList.innerHTML=""; if(els.pptSlideTitle) els.pptSlideTitle.value=""; if(els.pptSlideContent) els.pptSlideContent.value=""; setDateControl(els.todoDue, els.todoDueText, nextSunday()); setDateControl(els.quizDate, els.quizDateText, nextSunday()); renderPreview(); }
     function renderList(){ const q=(els.searchInput.value||"").toLowerCase().trim(); const fs=els.filterStructure.value; let arr=sermonsArray(true); if(q) arr=arr.filter(s=>[s.title,s.passage,s.keywords,s.theme,s.onePoint,s.summary,s.audience].join(" ").toLowerCase().includes(q)); if(fs) arr=arr.filter(s=>(s.structure||"")===fs); arr=sortArray(arr,els.sortMode.value); els.sermonList.innerHTML=arr.length?"":`<div class="empty">검색 결과가 없습니다.<br>+ 새 설교를 눌러 기록을 시작하세요.</div>`; arr.forEach(s=>{ const item=document.createElement("button"); item.className="sermon-item"+(s.id===state.currentId?" active":""); item.innerHTML=`<div class="sermon-date">${escapeHtml(formatDate(s.sermonDate||nextSunday()))}</div><div style="min-width:0;flex:1;text-align:left"><div class="sermon-title">${escapeHtml(s.title||"제목 없음")}</div><div class="sermon-meta">${escapeHtml(s.passage||"본문 미입력")} · ${escapeHtml(s.structure||"형식 미지정")}</div><div class="tagline">${tags(s.keywords).slice(0,4).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div></div>`; item.addEventListener("click",()=>{ if(current()) saveCurrent({silent:true}); state.currentId=s.id; saveLocal(); renderEditor(); showTab("basic"); setMobilePanel("edit"); }); els.sermonList.appendChild(item); }); els.listCount.textContent=arr.length; els.countPill.textContent=`${sermonsArray(false).length}편 · ${state.room}`; }
     function renderStats(){ const arr=sermonsArray(false); const feedbackCount=arr.reduce((n,s)=>n+(s.feedbacks?.length||0),0); const todoCount=arr.reduce((n,s)=>n+(s.todos||[]).filter(t=>!t.done).length,0); const quizCount=arr.reduce((n,s)=>n+(s.quizzes?.length||0),0); els.statsBox.innerHTML=`<div class="stat" data-go="list" title="설교 목록으로 이동"><b>${arr.length}</b><span>설교 기록</span></div><div class="stat" data-go="feedback" title="피드백 탭으로 이동"><b>${feedbackCount}</b><span>피드백</span></div><div class="stat" data-go="tasks" title="할 일 탭으로 이동"><b>${todoCount}</b><span>미완료 할 일</span></div><div class="stat" data-go="quiz" title="퀴즈 탭으로 이동"><b>${quizCount}</b><span>퀴즈</span></div>`; }
     function sortArray(arr,mode){ return [...arr].sort((a,b)=>{ if(mode==="dateAsc") return String(a.sermonDate||"").localeCompare(String(b.sermonDate||"")); if(mode==="updatedDesc") return String(b.updatedAtClient||"").localeCompare(String(a.updatedAtClient||"")); if(mode==="titleAsc") return String(a.title||"").localeCompare(String(b.title||""),"ko"); return String(b.sermonDate||"").localeCompare(String(a.sermonDate||"")); }); }
@@ -894,13 +910,73 @@ service cloud.firestore {
     }
     function wrapCanvasText(ctx,text,x,y,maxWidth,lineHeight,maxLines=5){ const words=String(text||"").replace(/\n/g," \n ").split(/\s+/); let line="", lines=[]; words.forEach(w=>{ if(w==="\n"){ lines.push(line); line=""; return; } const test=line?line+" "+w:w; if(ctx.measureText(test).width>maxWidth && line){ lines.push(line); line=w; } else line=test; }); if(line) lines.push(line); lines.slice(0,maxLines).forEach((ln,i)=>ctx.fillText(ln,x,y+i*lineHeight)); if(lines.length>maxLines) ctx.fillText("…",x,y+maxLines*lineHeight); }
 
+    function formatPptSlides(slides){
+      return (slides||[]).map((sl,i)=>`[PPT ${i+1}] ${sl.title||"제목 없음"}\n${sl.content||""}`.trim()).join("\n\n");
+    }
+    function addPptSlideFromForm(){
+      const title=(els.pptSlideTitle?.value||"").trim();
+      const content=(els.pptSlideContent?.value||"").trim();
+      if(!title && !content) return alert("PPT 제목 또는 내용을 입력해주세요.");
+      const cur=currentOrCreate();
+      cur.pptSlides=Array.isArray(cur.pptSlides)?cur.pptSlides:[];
+      cur.pptSlides.push({id:uid(), title, content, createdAt:new Date().toISOString(), updatedAtClient:new Date().toISOString()});
+      if(els.pptSlideTitle) els.pptSlideTitle.value="";
+      if(els.pptSlideContent) els.pptSlideContent.value="";
+      persistSermon(cur);
+      showTab("manuscript");
+    }
+    function renderPptSlides(){
+      if(!els.pptSlideList) return;
+      const cur=current();
+      const list=Array.isArray(cur?.pptSlides)?cur.pptSlides:[];
+      els.pptSlideList.innerHTML=list.length?"":`<div class="empty" style="margin-top:8px">PPT 순서가 없습니다. 제목과 내용을 입력한 뒤 추가하세요.</div>`;
+      list.forEach((sl,idx)=>{
+        const card=document.createElement("div"); card.className="ppt-slide-card";
+        card.innerHTML=`<b>PPT ${idx+1}. ${escapeHtml(sl.title||"제목 없음")}</b><div class="ppt-content">${escapeHtml(sl.content||"")}</div><div class="toolbar compact" style="margin-top:8px"><button class="btn small secondary" data-up>위로</button><button class="btn small secondary" data-down>아래로</button><button class="btn small secondary" data-edit>수정</button><button class="btn small secondary" data-load>불러오기</button><button class="btn small secondary" data-del>삭제</button></div>`;
+        card.querySelector("[data-up]").disabled=idx===0;
+        card.querySelector("[data-down]").disabled=idx===list.length-1;
+        card.querySelector("[data-up]").addEventListener("click",()=>{ [list[idx-1],list[idx]]=[list[idx],list[idx-1]]; persistSermon(cur); });
+        card.querySelector("[data-down]").addEventListener("click",()=>{ [list[idx+1],list[idx]]=[list[idx],list[idx+1]]; persistSermon(cur); });
+        card.querySelector("[data-load]").addEventListener("click",()=>{ els.pptSlideTitle.value=sl.title||""; els.pptSlideContent.value=sl.content||""; els.pptSlideTitle.focus(); });
+        card.querySelector("[data-edit]").addEventListener("click",()=>{ const title=prompt("PPT 제목 수정", sl.title||""); if(title===null) return; const content=prompt("PPT 내용 수정", sl.content||""); if(content===null) return; sl.title=title.trim(); sl.content=content.trim(); sl.updatedAtClient=new Date().toISOString(); persistSermon(cur); });
+        card.querySelector("[data-del]").addEventListener("click",()=>{ if(!confirm("이 PPT 순서를 삭제할까요?")) return; cur.pptSlides=list.filter(x=>x.id!==sl.id); persistSermon(cur); });
+        els.pptSlideList.appendChild(card);
+      });
+    }
+    function appendPptSlidesToManuscript(){
+      const cur=currentOrCreate();
+      const text=formatPptSlides(cur.pptSlides||[]);
+      if(!text) return alert("원고에 삽입할 PPT 순서가 없습니다.");
+      els.manuscriptInput.value+=(els.manuscriptInput.value.trim()?"\n\n":"")+"## PPT 순서별 원고 구성\n"+text;
+      cur.manuscript=els.manuscriptInput.value;
+      saveCurrent({silent:true});
+      renderPreview();
+    }
+    function copyPptSlides(){
+      const text=formatPptSlides(current()?.pptSlides||[]);
+      if(!text) return alert("복사할 PPT 순서가 없습니다.");
+      copyTextWithToast(text,"PPT 순서별 구성을 복사했습니다");
+    }
+    let readerFontSize=22;
+    function openManuscriptReader(){
+      saveCurrent({silent:true});
+      const cur=collectCurrent();
+      els.readerTitle.textContent=cur.title||"제목 없음";
+      els.readerMeta.textContent=`${formatDate(cur.sermonDate||nextSunday())} · ${cur.passage||"본문 미입력"} · ${cur.structure||""}`;
+      els.readerContent.textContent=cur.manuscript||"원고 미작성";
+      els.readerSheet.style.fontSize=readerFontSize+"px";
+      els.manuscriptFullModal.classList.add("open");
+    }
+    function closeManuscriptReader(){ els.manuscriptFullModal.classList.remove("open"); }
+    function adjustReaderFont(delta){ readerFontSize=Math.max(16, Math.min(34, readerFontSize+delta)); if(els.readerSheet) els.readerSheet.style.fontSize=readerFontSize+"px"; }
+
     function quickToManuscript(){ const memo=els.quickMemo.value.trim(); if(!memo) return; const cur=currentOrCreate(); els.manuscriptInput.value+=(els.manuscriptInput.value.trim()?"\n\n":"")+`[메모] ${memo}`; cur.manuscript=els.manuscriptInput.value; els.quickMemo.value=""; saveCurrent({silent:true}); renderPreview(); setMobilePanel("manuscript"); }
     function quickToFeedback(){ const memo=els.quickMemo.value.trim(); if(!memo) return; addFeedback({category:"기타",topic:"빠른 메모",source:"본인",status:"검토중",text:memo,action:"",reflection:""}); els.quickMemo.value=""; showTab("feedback"); }
     function quickToTodo(){ const memo=els.quickMemo.value.trim(); if(!memo) return; addTodo(memo,"","준비",false); els.quickMemo.value=""; showTab("tasks"); }
     function toggleQuickMemo(){ els.quickPad.classList.toggle("open"); if(els.quickPad.classList.contains("open")) setTimeout(()=>els.quickMemo.focus(),50); }
 
     function showTab(name){ activateTabOnly(name); if(window.matchMedia("(max-width: 860px)").matches){ document.body.dataset.mobilePanel="edit"; setMobileNavActive(name==="manuscript"?"manuscript":"edit"); } }
-    function setMobilePanel(panel){ if(panel==="manuscript"){ document.body.dataset.mobilePanel="edit"; activateTabOnly("manuscript"); setMobileNavActive("manuscript"); } else if(panel==="edit"){ document.body.dataset.mobilePanel="edit"; if(document.querySelector('.view.active')?.dataset.view==="manuscript") activateTabOnly("basic"); setMobileNavActive("edit"); } else { document.body.dataset.mobilePanel=panel; setMobileNavActive(panel); } }
+    function setMobilePanel(panel){ if(panel==="manuscript"){ document.body.dataset.mobilePanel="edit"; activateTabOnly("manuscript"); setMobileNavActive("manuscript"); } else if(panel==="tasks"){ document.body.dataset.mobilePanel="edit"; activateTabOnly("tasks"); setMobileNavActive("tasks"); } else if(panel==="edit"){ document.body.dataset.mobilePanel="edit"; const active=document.querySelector('.view.active')?.dataset.view; if(active==="manuscript" || active==="tasks") activateTabOnly("basic"); setMobileNavActive("edit"); } else { document.body.dataset.mobilePanel=panel; setMobileNavActive(panel); } }
     function setMobileNavActive(panel){ document.querySelectorAll("#mobileNav button").forEach(b=>b.classList.toggle("active", b.dataset.panel===panel)); }
     function activateTabOnly(name){ document.querySelectorAll("#mainTabs .tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name)); document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.dataset.view===name)); }
 
