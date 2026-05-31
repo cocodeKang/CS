@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>설교일지 v1.16 · Firestore 동기화</title>
+  <title>설교일지 v1.17 · Firestore 동기화</title>
   <style>
     :root{
       --bg:#f6f4ef;--paper:#fffdf8;--card:#fff;--ink:#1d211f;--muted:#6f746f;--line:#e2ddd2;
@@ -57,7 +57,7 @@
 <body data-mobile-panel="edit">
   <div class="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.16</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
+      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.17</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
       <div class="top-actions">
         <span class="pill"><span id="syncDot" class="dot warn"></span><span id="syncText">연결 준비</span></span>
         <span class="pill hide-mobile" id="countPill">0편</span>
@@ -98,6 +98,7 @@
             <div class="structure-guide" id="structureGuide"></div>
             <div class="field"><label>제목 <span class="info-dot" data-info="설교의 핵심 메시지가 드러나는 짧고 선명한 제목을 적습니다.">!</span></label><input id="titleInput" placeholder="예: 다시 복음 앞에 서다" /></div>
             <div class="grid2"><div class="field"><label>본문 말씀 <span class="info-dot" data-info="본문 범위를 적습니다. 예: 창세기 45:1-15. 📖는 성경검색, 🔗는 본문별 주소 저장, ↗는 저장된 주소로 이동합니다.">!</span></label><div class="passage-tools"><input id="passageInput" placeholder="예: 창세기 45:1-15" /><button class="btn secondary tiny-icon" id="btnPassageBible" title="성경검색 열기">📖</button><button class="btn secondary tiny-icon" id="btnPassageUrl" title="이 본문 바로가기 주소 입력">🔗</button><button class="btn secondary tiny-icon" id="btnOpenPassageUrl" title="저장된 본문 주소로 이동">↗</button></div><input id="passageUrlInput" placeholder="본문 바로가기 주소가 있으면 여기에 저장됩니다" style="margin-top:6px;display:none" /></div><div class="field"><label>대상/상황 <span class="info-dot" data-info="누가 듣는 설교인지 적습니다. 기본값은 주일학교예배이며 필요하면 수정하세요.">!</span></label><input id="audienceInput" placeholder="예: 주일학교예배, 주일예배, 청년부, 장례예배" /></div></div>
+            <div class="grid2"><div class="field"><label>배울말씀 <span class="info-dot" data-info="이번 설교나 공과에서 함께 배울 긴 본문 범위를 적습니다. 예: 출애굽기 13:17-14:31, 16:1-36. 📖를 누르면 성경검색으로 이동합니다.">!</span></label><div class="date-row"><input id="learningPassageInput" placeholder="예: 출애굽기 13:17-14:31, 16:1-36" /><button class="btn secondary tiny-icon" id="btnLearningBible" title="배울말씀 성경검색">📖</button></div></div><div class="field"><label>외울말씀 <span class="info-dot" data-info="아이들이 외우거나 함께 암송할 핵심 구절을 적습니다. 예: 출 14:14. 📖를 누르면 성경검색으로 이동합니다.">!</span></label><div class="date-row"><input id="memoryVerseInput" placeholder="예: 출 14:14" /><button class="btn secondary tiny-icon" id="btnMemoryBible" title="외울말씀 성경검색">📖</button></div></div></div>
             <div class="grid2"><div class="field"><label>키워드 <span class="info-dot" data-info="나중에 찾기 쉽도록 핵심 단어를 쉼표로 구분해 적습니다. 예: 은혜, 회복, 순종.">!</span></label><input id="keywordsInput" placeholder="쉼표로 구분: 은혜, 회복, 순종" /></div><div class="field"><label>주제 <span class="info-dot" data-info="설교가 다루는 중심 주제를 한 문장 또는 짧은 구로 적습니다.">!</span></label><input id="themeInput" placeholder="설교가 다루는 중심 주제" /></div></div>
             <div class="field"><label>원포인트 / 한 문장 메시지 <span class="info-dot" data-info="청중이 설교 후 붙잡고 돌아갈 한 문장입니다. 설교 전체를 이 한 문장에 모읍니다.">!</span></label><textarea id="onePointInput" placeholder="청중이 설교 후 붙잡고 돌아갈 한 문장"></textarea></div>
             <div class="field"><label>설교 목적 <span class="info-dot" data-info="청중이 무엇을 알고, 느끼고, 결단하기 원하는지 적습니다.">!</span></label><textarea id="purposeInput" placeholder="청중이 무엇을 알고, 느끼고, 결단하기 원하는가?"></textarea></div>
@@ -270,12 +271,12 @@ service cloud.firestore {
     let saveTimer = null;
     let typingRenderHoldUntil = 0;
     const remoteSaveTimers = new Map();
-    const state = { sermons:{}, currentId:null, room:sanitizeRoom(localStorage.getItem(ROOM_KEY)||DEFAULT_ROOM), updateNotes:"", updateSavedAt:"", updateHistory:[], reflectionBox:[], prepQuestionBox:[], ready:false, uid:null, deletedIds:new Set() };
+    const state = { sermons:{}, currentId:null, room:sanitizeRoom(localStorage.getItem(ROOM_KEY)||DEFAULT_ROOM), updateNotes:"", updateSavedAt:"", updateHistory:[], reflectionBox:[], prepQuestionBox:[], ready:false, uid:null, deletedIds:new Set(), editingQuizId:null, editingPptSlideId:null };
     if(state.room === "room") { state.room = DEFAULT_ROOM; localStorage.setItem(ROOM_KEY, DEFAULT_ROOM); }
     const $ = (id) => document.getElementById(id);
     const els = {
       syncDot:$("syncDot"), syncText:$("syncText"), countPill:$("countPill"), roomInput:$("roomInput"), listCount:$("listCount"), sermonList:$("sermonList"), searchInput:$("searchInput"), filterStructure:$("filterStructure"), sortMode:$("sortMode"), statsBox:$("statsBox"),
-      sermonDate:$("sermonDate"), sermonDateText:$("sermonDateText"), structureSelect:$("structureSelect"), structureGuide:$("structureGuide"), titleInput:$("titleInput"), passageInput:$("passageInput"), passageUrlInput:$("passageUrlInput"), audienceInput:$("audienceInput"), keywordsInput:$("keywordsInput"), themeInput:$("themeInput"), onePointInput:$("onePointInput"), purposeInput:$("purposeInput"), textNoteInput:$("textNoteInput"), summaryInput:$("summaryInput"),
+      sermonDate:$("sermonDate"), sermonDateText:$("sermonDateText"), structureSelect:$("structureSelect"), structureGuide:$("structureGuide"), titleInput:$("titleInput"), passageInput:$("passageInput"), passageUrlInput:$("passageUrlInput"), learningPassageInput:$("learningPassageInput"), memoryVerseInput:$("memoryVerseInput"), audienceInput:$("audienceInput"), keywordsInput:$("keywordsInput"), themeInput:$("themeInput"), onePointInput:$("onePointInput"), purposeInput:$("purposeInput"), textNoteInput:$("textNoteInput"), summaryInput:$("summaryInput"),
       prepSearch:$("prepSearch"), questionList:$("questionList"), questionBankCategory:$("questionBankCategory"), questionBankSearch:$("questionBankSearch"), questionBankList:$("questionBankList"), customPrepQuestion:$("customPrepQuestion"),
       reflectionSearch:$("reflectionSearch"), reflectionAskPanel:$("reflectionAskPanel"), reflectionAskInput:$("reflectionAskInput"), reflectionSort:$("reflectionSort"), reflectionList:$("reflectionList"), customReflectionQuestion:$("customReflectionQuestion"), reflectionBoxList:$("reflectionBoxList"), manuscriptInput:$("manuscriptInput"), pptSlideTitle:$("pptSlideTitle"), pptSlideContent:$("pptSlideContent"), pptSlideList:$("pptSlideList"), previewTitle:$("previewTitle"), previewMeta:$("previewMeta"), previewContent:$("previewContent"), wordCount:$("wordCount"),
       todoText:$("todoText"), todoDue:$("todoDue"), todoDueText:$("todoDueText"), todoType:$("todoType"), todoImportant:$("todoImportant"), todoSearch:$("todoSearch"), todoList:$("todoList"),
@@ -319,6 +320,8 @@ service cloud.firestore {
       $("btnGithub").addEventListener("click", () => openExternal(GITHUB_EDIT_URL));
       $("btnHelp").addEventListener("click", openHelp);
       $("btnPassageBible").addEventListener("click", () => openExternal(buildBibleSearchUrl()));
+      $("btnLearningBible").addEventListener("click", () => openExternal(buildBibleSearchUrlFromText(els.learningPassageInput?.value || current()?.learningPassage || "")));
+      $("btnMemoryBible").addEventListener("click", () => openExternal(buildBibleSearchUrlFromText(els.memoryVerseInput?.value || current()?.memoryVerse || "")));
       $("btnPassageUrl").addEventListener("click", promptPassageUrl);
       $("btnOpenPassageUrl").addEventListener("click", openPassageUrl);
       $("btnCloseHelp").addEventListener("click", closeHelp);
@@ -346,6 +349,7 @@ service cloud.firestore {
       $("btnAddPptSlide").addEventListener("click", addPptSlideFromForm);
       $("btnAppendPptSlides").addEventListener("click", appendPptSlidesToManuscript);
       $("btnCopyPptSlides").addEventListener("click", copyPptSlides);
+      [els.pptSlideTitle, els.pptSlideContent].forEach(el => el?.addEventListener("input", autoSaveLoadedPptSlideFromForm));
       $("btnAddTodo").addEventListener("click", addTodoFromForm);
       $("btnAddFeedback").addEventListener("click", addFeedbackFromForm);
       $("btnAddQuiz").addEventListener("click", addQuizFromForm);
@@ -353,12 +357,15 @@ service cloud.firestore {
       $("btnDownloadQuizImage").addEventListener("click", () => downloadQuizImage(null, "question"));
       $("btnDownloadQuizFullImage").addEventListener("click", () => downloadQuizImage(null, "full"));
       $("btnDownloadQuizAnswerImage").addEventListener("click", () => downloadQuizImage(null, "answer"));
-      els.quizFormat.addEventListener("change", updateQuizFormatUI);
-      els.quizChoiceCount.addEventListener("change", () => renderChoiceInputs());
+      els.quizFormat.addEventListener("change", () => { updateQuizFormatUI(); autoSaveLoadedQuizFromForm(); });
+      els.quizChoiceCount.addEventListener("change", () => { renderChoiceInputs(); autoSaveLoadedQuizFromForm(); });
+      [els.quizTarget, els.quizPassage, els.quizQuestion, els.quizOptions, els.quizAnswer, els.quizExplanation, els.quizFeedback, els.quizPptNote, els.quizImageFontSize].forEach(el => el?.addEventListener("input", autoSaveLoadedQuizFromForm));
+      [els.quizTarget, els.quizDate, els.quizFormat].forEach(el => el?.addEventListener("change", autoSaveLoadedQuizFromForm));
+      els.quizChoiceInputs?.addEventListener("input", autoSaveLoadedQuizFromForm);
       $("btnQuizBible").addEventListener("click", () => openExternal(buildBibleSearchUrlFromText(els.quizPassage.value)));
       $("btnQuizDatePick").addEventListener("click", () => openHiddenDatePicker(els.quizDate));
       els.quizDateText.addEventListener("click", () => openHiddenDatePicker(els.quizDate));
-      els.quizDate.addEventListener("change", () => setDateControl(els.quizDate, els.quizDateText, els.quizDate.value));
+      els.quizDate.addEventListener("change", () => { setDateControl(els.quizDate, els.quizDateText, els.quizDate.value); autoSaveLoadedQuizFromForm(); });
       $("btnTodoDuePick").addEventListener("click", () => openHiddenDatePicker(els.todoDue));
       els.todoDueText.addEventListener("click", () => openHiddenDatePicker(els.todoDue));
       els.todoDue.addEventListener("change", () => setDateControl(els.todoDue, els.todoDueText, els.todoDue.value));
@@ -401,7 +408,7 @@ service cloud.firestore {
       els.statsBox.addEventListener("click", e => { const stat=e.target.closest(".stat[data-go]"); if(stat) goFromStat(stat.dataset.go); });
       document.addEventListener("click", e => { const info=e.target.closest(".info-dot"); if(info){ alert(info.dataset.info || "이 항목의 안내입니다."); } });
 
-      const saveInputs = [els.titleInput,els.passageInput,els.passageUrlInput,els.audienceInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput];
+      const saveInputs = [els.titleInput,els.passageInput,els.passageUrlInput,els.learningPassageInput,els.memoryVerseInput,els.audienceInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput];
       saveInputs.forEach(el => el.addEventListener("input", () => { scheduleSave(); renderPreview(); if(el !== els.manuscriptInput){ renderStats(); renderList(); } }));
       els.structureSelect.addEventListener("change", () => { const cur=currentOrCreate(); cur.structure=els.structureSelect.value; syncPrepQuestionsToStructure(cur); applyStructureGuide(); refreshBasicPlaceholders(); scheduleSave(); renderPrepQuestions(); renderQuestionBank(); renderPreview(); });
       document.addEventListener("keydown", handleShortcuts, true);
@@ -478,7 +485,7 @@ service cloud.firestore {
 
     function defaultSermon(){
       const date=nextSunday();
-      const s={ id:uid(), localOnly:true, sermonDate:date, dateDisplay:formatDate(date), title:"", passage:"", passageUrl:"", audience:"주일학교예배", keywords:"", theme:"", structure:"서론-본론-결론", onePoint:"", purpose:"", textNote:"", summary:"", prepQuestions:[], prepAnswers:{}, reflectionQuestions:[], reflectionAnswers:{}, removedPrepQuestionIds:[], removedReflectionQuestionIds:[], manuscript:"", pptSlides:[], todos:[], feedbacks:[], quizzes:[], createdAtClient:new Date().toISOString(), updatedAtClient:new Date().toISOString() };
+      const s={ id:uid(), localOnly:true, sermonDate:date, dateDisplay:formatDate(date), title:"", passage:"", passageUrl:"", learningPassage:"", memoryVerse:"", audience:"주일학교예배", keywords:"", theme:"", structure:"서론-본론-결론", onePoint:"", purpose:"", textNote:"", summary:"", prepQuestions:[], prepAnswers:{}, reflectionQuestions:[], reflectionAnswers:{}, removedPrepQuestionIds:[], removedReflectionQuestionIds:[], manuscript:"", pptSlides:[], todos:[], feedbacks:[], quizzes:[], createdAtClient:new Date().toISOString(), updatedAtClient:new Date().toISOString() };
       resetPrepQuestionData(s);
       resetReflectionQuestionData(s);
       return s;
@@ -499,7 +506,7 @@ service cloud.firestore {
       stampQuestionList(n.reflectionQuestions);
       return n;
     }
-    function hasSermonContent(s){ if(!s) return false; const fields=[s.title,s.passage,s.passageUrl,s.audience,s.keywords,s.theme,s.onePoint,s.purpose,s.textNote,s.summary,s.manuscript]; const hasText=fields.some(v=>String(v||"").trim()); const hasPrep=Object.values(s.prepAnswers||{}).some(v=>typeof v==="string" ? v.trim() : String(v?.answer||"").trim()); const hasReflect=Object.values(s.reflectionAnswers||{}).some(v=>String(v?.answer||"").trim() || v?.resolved); return hasText || hasPrep || hasReflect || (s.todos||[]).length || (s.feedbacks||[]).length || (s.quizzes||[]).length || (s.pptSlides||[]).length; }
+    function hasSermonContent(s){ if(!s) return false; const fields=[s.title,s.passage,s.passageUrl,s.learningPassage,s.memoryVerse,s.audience,s.keywords,s.theme,s.onePoint,s.purpose,s.textNote,s.summary,s.manuscript]; const hasText=fields.some(v=>String(v||"").trim()); const hasPrep=Object.values(s.prepAnswers||{}).some(v=>typeof v==="string" ? v.trim() : String(v?.answer||"").trim()); const hasReflect=Object.values(s.reflectionAnswers||{}).some(v=>String(v?.answer||"").trim() || v?.resolved); return hasText || hasPrep || hasReflect || (s.todos||[]).length || (s.feedbacks||[]).length || (s.quizzes||[]).length || (s.pptSlides||[]).length; }
     function sermonsArray(includeCurrentDraft=false){ return Object.values(state.sermons).filter(s => hasSermonContent(s) || (includeCurrentDraft && s.id===state.currentId)); }
     function sortedSermons(){ return sortArray(sermonsArray(false), "dateDesc"); }
     function current(){ return state.sermons[state.currentId] || null; }
@@ -532,7 +539,7 @@ service cloud.firestore {
 
     function collectCurrent(){
       const cur=currentOrCreate();
-      cur.sermonDate=els.sermonDate.value || nextSunday(); cur.dateDisplay=formatDate(cur.sermonDate); cur.structure=els.structureSelect.value || "서론-본론-결론"; cur.title=els.titleInput.value.trim(); cur.passage=els.passageInput.value.trim(); cur.passageUrl=els.passageUrlInput.value.trim(); cur.audience=els.audienceInput.value.trim(); cur.keywords=els.keywordsInput.value.trim(); cur.theme=els.themeInput.value.trim(); cur.onePoint=els.onePointInput.value.trim(); cur.purpose=els.purposeInput.value.trim(); cur.textNote=els.textNoteInput.value.trim(); cur.summary=els.summaryInput.value.trim(); cur.manuscript=els.manuscriptInput.value;
+      cur.sermonDate=els.sermonDate.value || nextSunday(); cur.dateDisplay=formatDate(cur.sermonDate); cur.structure=els.structureSelect.value || "서론-본론-결론"; cur.title=els.titleInput.value.trim(); cur.passage=els.passageInput.value.trim(); cur.passageUrl=els.passageUrlInput.value.trim(); cur.learningPassage=els.learningPassageInput?.value.trim() || ""; cur.memoryVerse=els.memoryVerseInput?.value.trim() || ""; cur.audience=els.audienceInput.value.trim(); cur.keywords=els.keywordsInput.value.trim(); cur.theme=els.themeInput.value.trim(); cur.onePoint=els.onePointInput.value.trim(); cur.purpose=els.purposeInput.value.trim(); cur.textNote=els.textNoteInput.value.trim(); cur.summary=els.summaryInput.value.trim(); cur.manuscript=els.manuscriptInput.value;
       cur.pptSlides = Array.isArray(cur.pptSlides) ? cur.pptSlides : []; cur.prepAnswers=collectPrepAnswers(cur); cur.reflectionAnswers=collectReflectionAnswers(cur); syncPostSermonFeedback(cur); cur.updatedAtClient=new Date().toISOString(); cur.localOnly=!hasSermonContent(cur); state.sermons[cur.id]=cur; return cur;
     }
     function collectPrepAnswers(cur=current()){ const old={...(cur?.prepAnswers||{})}; document.querySelectorAll("[data-prep-key]").forEach(t => { old[t.dataset.prepKey]=t.value; }); return old; }
@@ -570,9 +577,9 @@ service cloud.firestore {
     }
     function renderEditorPieces(){ renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); renderPptSlides(); renderGlobalFeedback(); renderStats(); renderList(); renderPreview(); }
 
-    function renderEditor(){ const cur=current(); if(!cur){ clearEditor(); return; } ensurePrepQuestions(cur); ensureReflectionQuestions(cur); els.sermonDate.value=cur.sermonDate || nextSunday(); els.sermonDateText.value=formatDate(els.sermonDate.value); els.structureSelect.value=cur.structure || "서론-본론-결론"; els.titleInput.value=cur.title||""; els.passageInput.value=cur.passage||""; els.passageUrlInput.value=cur.passageUrl||""; els.audienceInput.value=cur.audience||"주일학교예배"; els.keywordsInput.value=cur.keywords||""; els.themeInput.value=cur.theme||""; els.onePointInput.value=cur.onePoint||""; els.purposeInput.value=cur.purpose||""; els.textNoteInput.value=cur.textNote||""; els.summaryInput.value=cur.summary||""; els.manuscriptInput.value=cur.manuscript||""; applyStructureGuide(); refreshBasicPlaceholders(); renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); renderPptSlides(); if(els.todoDue && !els.todoDue.value) setDateControl(els.todoDue, els.todoDueText, nextSunday()); if(els.quizDate && !els.quizDate.value) setDateControl(els.quizDate, els.quizDateText, cur.sermonDate || nextSunday()); updateQuizFormatUI(); renderPreview(); renderList(); }
-    function clearEditor(){ [els.titleInput,els.passageInput,els.passageUrlInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput].forEach(e=>e.value=""); els.audienceInput.value="주일학교예배"; const d=nextSunday(); els.sermonDate.value=d; els.sermonDateText.value=formatDate(d); els.questionList.innerHTML=`<div class="empty">새 설교를 누르거나 내용을 입력하면 준비질문을 사용할 수 있습니다.</div>`; els.questionBankList.innerHTML=""; els.reflectionList.innerHTML=""; els.todoList.innerHTML=""; els.feedbackList.innerHTML=""; if(els.quizList) els.quizList.innerHTML=""; if(els.pptSlideList) els.pptSlideList.innerHTML=""; if(els.pptSlideTitle) els.pptSlideTitle.value=""; if(els.pptSlideContent) els.pptSlideContent.value=""; setDateControl(els.todoDue, els.todoDueText, nextSunday()); setDateControl(els.quizDate, els.quizDateText, nextSunday()); renderPreview(); }
-    function renderList(){ const q=(els.searchInput.value||"").toLowerCase().trim(); const fs=els.filterStructure.value; let arr=sermonsArray(true); if(q) arr=arr.filter(s=>[s.title,s.passage,s.keywords,s.theme,s.onePoint,s.summary,s.audience].join(" ").toLowerCase().includes(q)); if(fs) arr=arr.filter(s=>(s.structure||"")===fs); arr=sortArray(arr,els.sortMode.value); els.sermonList.innerHTML=arr.length?"":`<div class="empty">검색 결과가 없습니다.<br>+ 새 설교를 눌러 기록을 시작하세요.</div>`; arr.forEach(s=>{ const item=document.createElement("button"); item.className="sermon-item"+(s.id===state.currentId?" active":""); item.innerHTML=`<div class="sermon-date">${escapeHtml(formatDate(s.sermonDate||nextSunday()))}</div><div style="min-width:0;flex:1;text-align:left"><div class="sermon-title">${escapeHtml(s.title||"제목 없음")}</div><div class="sermon-meta">${escapeHtml(s.passage||"본문 미입력")} · ${escapeHtml(s.structure||"형식 미지정")}</div><div class="tagline">${tags(s.keywords).slice(0,4).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div></div>`; item.addEventListener("click",()=>{ if(current()) saveCurrent({silent:true}); state.currentId=s.id; saveLocal(); renderEditor(); showTab("basic"); setMobilePanel("edit"); }); els.sermonList.appendChild(item); }); els.listCount.textContent=arr.length; els.countPill.textContent=`${sermonsArray(false).length}편 · ${state.room}`; }
+    function renderEditor(){ setQuizEditMode(null); setPptEditMode(null); const cur=current(); if(!cur){ clearEditor(); return; } ensurePrepQuestions(cur); ensureReflectionQuestions(cur); els.sermonDate.value=cur.sermonDate || nextSunday(); els.sermonDateText.value=formatDate(els.sermonDate.value); els.structureSelect.value=cur.structure || "서론-본론-결론"; els.titleInput.value=cur.title||""; els.passageInput.value=cur.passage||""; els.passageUrlInput.value=cur.passageUrl||""; if(els.learningPassageInput) els.learningPassageInput.value=cur.learningPassage||""; if(els.memoryVerseInput) els.memoryVerseInput.value=cur.memoryVerse||""; els.audienceInput.value=cur.audience||"주일학교예배"; els.keywordsInput.value=cur.keywords||""; els.themeInput.value=cur.theme||""; els.onePointInput.value=cur.onePoint||""; els.purposeInput.value=cur.purpose||""; els.textNoteInput.value=cur.textNote||""; els.summaryInput.value=cur.summary||""; els.manuscriptInput.value=cur.manuscript||""; applyStructureGuide(); refreshBasicPlaceholders(); renderPrepQuestions(); renderQuestionBank(); renderReflectionQuestions(); renderTodos(); renderFeedbacks(); renderQuizzes(); renderPptSlides(); if(els.todoDue && !els.todoDue.value) setDateControl(els.todoDue, els.todoDueText, nextSunday()); if(els.quizDate && !els.quizDate.value) setDateControl(els.quizDate, els.quizDateText, cur.sermonDate || nextSunday()); updateQuizFormatUI(); renderPreview(); renderList(); }
+    function clearEditor(){ [els.titleInput,els.passageInput,els.passageUrlInput,els.learningPassageInput,els.memoryVerseInput,els.keywordsInput,els.themeInput,els.onePointInput,els.purposeInput,els.textNoteInput,els.summaryInput,els.manuscriptInput].forEach(e=>e.value=""); els.audienceInput.value="주일학교예배"; const d=nextSunday(); els.sermonDate.value=d; els.sermonDateText.value=formatDate(d); els.questionList.innerHTML=`<div class="empty">새 설교를 누르거나 내용을 입력하면 준비질문을 사용할 수 있습니다.</div>`; els.questionBankList.innerHTML=""; els.reflectionList.innerHTML=""; els.todoList.innerHTML=""; els.feedbackList.innerHTML=""; if(els.quizList) els.quizList.innerHTML=""; if(els.pptSlideList) els.pptSlideList.innerHTML=""; if(els.pptSlideTitle) els.pptSlideTitle.value=""; if(els.pptSlideContent) els.pptSlideContent.value=""; setPptEditMode(null); setQuizEditMode(null); setDateControl(els.todoDue, els.todoDueText, nextSunday()); setDateControl(els.quizDate, els.quizDateText, nextSunday()); renderPreview(); }
+    function renderList(){ const q=(els.searchInput.value||"").toLowerCase().trim(); const fs=els.filterStructure.value; let arr=sermonsArray(true); if(q) arr=arr.filter(s=>[s.title,s.passage,s.learningPassage,s.memoryVerse,s.keywords,s.theme,s.onePoint,s.summary,s.audience].join(" ").toLowerCase().includes(q)); if(fs) arr=arr.filter(s=>(s.structure||"")===fs); arr=sortArray(arr,els.sortMode.value); els.sermonList.innerHTML=arr.length?"":`<div class="empty">검색 결과가 없습니다.<br>+ 새 설교를 눌러 기록을 시작하세요.</div>`; arr.forEach(s=>{ const item=document.createElement("button"); item.className="sermon-item"+(s.id===state.currentId?" active":""); item.innerHTML=`<div class="sermon-date">${escapeHtml(formatDate(s.sermonDate||nextSunday()))}</div><div style="min-width:0;flex:1;text-align:left"><div class="sermon-title">${escapeHtml(s.title||"제목 없음")}</div><div class="sermon-meta">${escapeHtml(s.passage||"본문 미입력")} · ${escapeHtml(s.structure||"형식 미지정")}</div><div class="tagline">${tags(s.keywords).slice(0,4).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div></div>`; item.addEventListener("click",()=>{ if(current()) saveCurrent({silent:true}); state.currentId=s.id; saveLocal(); renderEditor(); showTab("basic"); setMobilePanel("edit"); }); els.sermonList.appendChild(item); }); els.listCount.textContent=arr.length; els.countPill.textContent=`${sermonsArray(false).length}편 · ${state.room}`; }
     function renderStats(){ const arr=sermonsArray(false); const feedbackCount=arr.reduce((n,s)=>n+(s.feedbacks?.length||0),0); const todoCount=arr.reduce((n,s)=>n+(s.todos||[]).filter(t=>!t.done).length,0); const quizCount=arr.reduce((n,s)=>n+(s.quizzes?.length||0),0); els.statsBox.innerHTML=`<div class="stat" data-go="list" title="설교 목록으로 이동"><b>${arr.length}</b><span>설교 기록</span></div><div class="stat" data-go="feedback" title="피드백 탭으로 이동"><b>${feedbackCount}</b><span>피드백</span></div><div class="stat" data-go="tasks" title="할 일 탭으로 이동"><b>${todoCount}</b><span>미완료 할 일</span></div><div class="stat" data-go="quiz" title="퀴즈 탭으로 이동"><b>${quizCount}</b><span>퀴즈</span></div>`; }
     function sortArray(arr,mode){ return [...arr].sort((a,b)=>{ if(mode==="dateAsc") return String(a.sermonDate||"").localeCompare(String(b.sermonDate||"")); if(mode==="updatedDesc") return String(b.updatedAtClient||"").localeCompare(String(a.updatedAtClient||"")); if(mode==="titleAsc") return String(a.title||"").localeCompare(String(b.title||""),"ko"); return String(b.sermonDate||"").localeCompare(String(a.sermonDate||"")); }); }
 
@@ -687,11 +694,11 @@ service cloud.firestore {
     }
     function addCustomReflectionQuestion(){ const text=els.customReflectionQuestion.value.trim(); if(!text) return; addReflectionQuestionText(text); els.customReflectionQuestion.value=""; }
 
-    function renderPreview(){ const cur=current(); const title=els.titleInput.value||cur?.title||"제목 없음"; const date=els.sermonDate.value||cur?.sermonDate||nextSunday(); const passage=els.passageInput.value||cur?.passage||"본문 미입력"; const manuscript=els.manuscriptInput.value||""; els.previewTitle.textContent=title; els.previewMeta.textContent=`${formatDate(date)} · ${passage} · ${els.structureSelect.value||""}`; els.previewContent.textContent=manuscript||"원고 미작성"; els.wordCount.textContent=`${manuscript.replace(/\s/g,"").length.toLocaleString()}자 / ${manuscript.split(/\s+/).filter(Boolean).length.toLocaleString()}어절`; }
+    function renderPreview(){ const cur=current(); const title=els.titleInput.value||cur?.title||"제목 없음"; const date=els.sermonDate.value||cur?.sermonDate||nextSunday(); const passage=els.passageInput.value||cur?.passage||"본문 미입력"; const learning=els.learningPassageInput?.value||cur?.learningPassage||""; const memory=els.memoryVerseInput?.value||cur?.memoryVerse||""; const manuscript=els.manuscriptInput.value||""; els.previewTitle.textContent=title; els.previewMeta.textContent=[formatDate(date), passage, learning?`배울말씀: ${learning}`:"", memory?`외울말씀: ${memory}`:"", els.structureSelect.value||""].filter(Boolean).join(" · "); els.previewContent.textContent=manuscript||"원고 미작성"; els.wordCount.textContent=`${manuscript.replace(/\s/g,"").length.toLocaleString()}자 / ${manuscript.split(/\s+/).filter(Boolean).length.toLocaleString()}어절`; }
     function insertHeadings(){ const cur=collectCurrent(); const hs=structures[cur.structure||"서론-본론-결론"]?.headings||["서론","본론","결론"]; els.manuscriptInput.value+=(els.manuscriptInput.value.trim()?"\n\n":"")+hs.map(h=>`## ${h}\n`).join("\n"); saveCurrent({silent:true}); renderPreview(); }
     async function copyManuscript(){ try{ await navigator.clipboard.writeText(els.manuscriptInput.value||""); setStatus("원고 복사 완료","ok"); }catch(e){ alert("복사 권한이 없어 직접 선택해 복사해주세요."); } }
-    async function copyPreview(){ const cur=collectCurrent(); const text=[cur.title||"제목 없음", `날짜: ${formatDate(cur.sermonDate||nextSunday())}`, `본문: ${cur.passage||"본문 미입력"}`, `형식: ${cur.structure||""}`, cur.theme?`주제: ${cur.theme}`:"", cur.onePoint?`핵심: ${cur.onePoint}`:"", "", cur.manuscript||"원고 미작성"].filter(v=>v!=="").join("\n"); await copyTextWithToast(text,"전체 미리보기를 복사했습니다"); }
-    async function printCurrent(){ clearTimeout(saveTimer); if(!current()) return alert("인쇄할 설교가 없습니다."); await saveCurrent({silent:true}); const cur=current(); if(!cur) return alert("인쇄할 설교가 없습니다."); els.printSheet.innerHTML=`<h1>${escapeHtml(cur.title||"제목 없음")}</h1><div class="print-meta">날짜: ${escapeHtml(formatDate(cur.sermonDate||nextSunday()))}<br>본문: ${escapeHtml(cur.passage||"본문 미입력")}<br>형식: ${escapeHtml(cur.structure||"")}<br>주제: ${escapeHtml(cur.theme||"")}<br>핵심: ${escapeHtml(cur.onePoint||"")}</div><div class="print-content">${escapeHtml(cur.manuscript||"")}</div><div class="print-footer">설교일지 · ${escapeHtml(state.room)}</div>`; requestAnimationFrame(()=>setTimeout(()=>window.print(),80)); }
+    async function copyPreview(){ const cur=collectCurrent(); const text=[cur.title||"제목 없음", `날짜: ${formatDate(cur.sermonDate||nextSunday())}`, `본문: ${cur.passage||"본문 미입력"}`, cur.learningPassage?`배울말씀: ${cur.learningPassage}`:"", cur.memoryVerse?`외울말씀: ${cur.memoryVerse}`:"", `형식: ${cur.structure||""}`, cur.theme?`주제: ${cur.theme}`:"", cur.onePoint?`핵심: ${cur.onePoint}`:"", "", cur.manuscript||"원고 미작성"].filter(v=>v!=="").join("\n"); await copyTextWithToast(text,"전체 미리보기를 복사했습니다"); }
+    async function printCurrent(){ clearTimeout(saveTimer); if(!current()) return alert("인쇄할 설교가 없습니다."); await saveCurrent({silent:true}); const cur=current(); if(!cur) return alert("인쇄할 설교가 없습니다."); els.printSheet.innerHTML=`<h1>${escapeHtml(cur.title||"제목 없음")}</h1><div class="print-meta">날짜: ${escapeHtml(formatDate(cur.sermonDate||nextSunday()))}<br>본문: ${escapeHtml(cur.passage||"본문 미입력")}<br>배울말씀: ${escapeHtml(cur.learningPassage||"-")}<br>외울말씀: ${escapeHtml(cur.memoryVerse||"-")}<br>형식: ${escapeHtml(cur.structure||"")}<br>주제: ${escapeHtml(cur.theme||"")}<br>핵심: ${escapeHtml(cur.onePoint||"")}</div><div class="print-content">${escapeHtml(cur.manuscript||"")}</div><div class="print-footer">설교일지 · ${escapeHtml(state.room)}</div>`; requestAnimationFrame(()=>setTimeout(()=>window.print(),80)); }
 
     function addTodoFromForm(){ const text=els.todoText.value.trim(); if(!text) return; addTodo(text,els.todoDue.value || nextSunday(),els.todoType.value,els.todoImportant.checked); els.todoText.value=""; setDateControl(els.todoDue, els.todoDueText, nextSunday()); els.todoImportant.checked=false; showTab("tasks"); }
     function addTodo(text,due="",type="준비",important=false){ if(!due) due=nextSunday(); const cur=currentOrCreate(); cur.todos=cur.todos||[]; cur.todos.unshift({id:uid(),text,due,type,important:!!important,done:false,createdAt:new Date().toISOString(),doneAt:""}); persistSermon(cur); }
@@ -779,6 +786,7 @@ service cloud.firestore {
       };
     }
     function clearQuizForm(){
+      setQuizEditMode(null);
       if(els.quizPassage) els.quizPassage.value="";
       if(els.quizQuestion) els.quizQuestion.value="";
       if(els.quizOptions) els.quizOptions.value="";
@@ -790,8 +798,28 @@ service cloud.firestore {
       renderChoiceInputs([]);
       updateQuizFormatUI();
     }
+    function setQuizEditMode(id){
+      state.editingQuizId = id || null;
+      const btn=$("btnAddQuiz");
+      if(btn) btn.textContent = state.editingQuizId ? "퀴즈 수정 완료" : "퀴즈 추가";
+    }
+    function autoSaveLoadedQuizFromForm(){
+      if(!state.editingQuizId) return;
+      const cur=current();
+      if(!cur || !Array.isArray(cur.quizzes)) return;
+      const quiz=cur.quizzes.find(x=>x.id===state.editingQuizId);
+      if(!quiz) { setQuizEditMode(null); return; }
+      Object.assign(quiz, quizFormData(), {updatedAtClient:new Date().toISOString()});
+      cur.updatedAtClient=new Date().toISOString();
+      state.sermons[cur.id]=cur;
+      saveLocal();
+      renderQuizzes();
+      debounceRemoteSave(cur);
+      setStatus("퀴즈 수정 내용 자동 반영", "ok");
+    }
     function fillQuizForm(z){
       if(!z) return;
+      setQuizEditMode(z.id || null);
       setDateControl(els.quizDate, els.quizDateText, z.date || current()?.sermonDate || nextSunday());
       if(els.quizTarget) els.quizTarget.value=z.target || "유치부";
       if(els.quizFormat) els.quizFormat.value=z.format || "OX";
@@ -812,7 +840,25 @@ service cloud.firestore {
       window.scrollTo?.({top:0, behavior:"smooth"});
       setStatus("퀴즈를 입력창으로 불러왔습니다", "ok");
     }
-    function addQuizFromForm(){ const data=quizFormData(); if(!data.question) return alert("퀴즈 문제를 입력해주세요."); const cur=currentOrCreate(); cur.quizzes=Array.isArray(cur.quizzes)?cur.quizzes:[]; cur.quizzes.unshift({id:uid(), createdAt:new Date().toISOString(), updatedAtClient:new Date().toISOString(), ...data}); persistSermon(cur); clearQuizForm(); showTab("quiz"); }
+    function addQuizFromForm(){
+      const data=quizFormData();
+      if(!data.question) return alert("퀴즈 문제를 입력해주세요.");
+      const cur=currentOrCreate();
+      cur.quizzes=Array.isArray(cur.quizzes)?cur.quizzes:[];
+      if(state.editingQuizId){
+        const quiz=cur.quizzes.find(x=>x.id===state.editingQuizId);
+        if(quiz) Object.assign(quiz, data, {updatedAtClient:new Date().toISOString()});
+        persistSermon(cur);
+        clearQuizForm();
+        showTab("quiz");
+        setStatus("퀴즈 수정 완료", "ok");
+        return;
+      }
+      cur.quizzes.unshift({id:uid(), createdAt:new Date().toISOString(), updatedAtClient:new Date().toISOString(), ...data});
+      persistSermon(cur);
+      clearQuizForm();
+      showTab("quiz");
+    }
     function renderQuizzes(){
       if(!els.quizList) return;
       const cur=current(); if(!cur){ els.quizList.innerHTML=""; return; }
@@ -913,13 +959,40 @@ service cloud.firestore {
     function formatPptSlides(slides){
       return (slides||[]).map((sl,i)=>`[PPT ${i+1}] ${sl.title||"제목 없음"}\n${sl.content||""}`.trim()).join("\n\n");
     }
+    function setPptEditMode(id){
+      state.editingPptSlideId = id || null;
+      const btn=$("btnAddPptSlide");
+      if(btn) btn.textContent = state.editingPptSlideId ? "PPT 수정 완료" : "PPT 순서 추가";
+    }
+    function autoSaveLoadedPptSlideFromForm(){
+      if(!state.editingPptSlideId) return;
+      const cur=current();
+      if(!cur || !Array.isArray(cur.pptSlides)) return;
+      const slide=cur.pptSlides.find(x=>x.id===state.editingPptSlideId);
+      if(!slide){ setPptEditMode(null); return; }
+      slide.title=(els.pptSlideTitle?.value||"").trim();
+      slide.content=(els.pptSlideContent?.value||"").trim();
+      slide.updatedAtClient=new Date().toISOString();
+      cur.updatedAtClient=new Date().toISOString();
+      state.sermons[cur.id]=cur;
+      saveLocal();
+      renderPptSlides();
+      debounceRemoteSave(cur);
+      setStatus("PPT 순서 수정 내용 자동 반영", "ok");
+    }
     function addPptSlideFromForm(){
       const title=(els.pptSlideTitle?.value||"").trim();
       const content=(els.pptSlideContent?.value||"").trim();
       if(!title && !content) return alert("PPT 제목 또는 내용을 입력해주세요.");
       const cur=currentOrCreate();
       cur.pptSlides=Array.isArray(cur.pptSlides)?cur.pptSlides:[];
-      cur.pptSlides.push({id:uid(), title, content, createdAt:new Date().toISOString(), updatedAtClient:new Date().toISOString()});
+      if(state.editingPptSlideId){
+        const slide=cur.pptSlides.find(x=>x.id===state.editingPptSlideId);
+        if(slide){ slide.title=title; slide.content=content; slide.updatedAtClient=new Date().toISOString(); }
+        setPptEditMode(null);
+      }else{
+        cur.pptSlides.push({id:uid(), title, content, createdAt:new Date().toISOString(), updatedAtClient:new Date().toISOString()});
+      }
       if(els.pptSlideTitle) els.pptSlideTitle.value="";
       if(els.pptSlideContent) els.pptSlideContent.value="";
       persistSermon(cur);
@@ -937,7 +1010,7 @@ service cloud.firestore {
         card.querySelector("[data-down]").disabled=idx===list.length-1;
         card.querySelector("[data-up]").addEventListener("click",()=>{ [list[idx-1],list[idx]]=[list[idx],list[idx-1]]; persistSermon(cur); });
         card.querySelector("[data-down]").addEventListener("click",()=>{ [list[idx+1],list[idx]]=[list[idx],list[idx+1]]; persistSermon(cur); });
-        card.querySelector("[data-load]").addEventListener("click",()=>{ els.pptSlideTitle.value=sl.title||""; els.pptSlideContent.value=sl.content||""; els.pptSlideTitle.focus(); });
+        card.querySelector("[data-load]").addEventListener("click",()=>{ setPptEditMode(sl.id); els.pptSlideTitle.value=sl.title||""; els.pptSlideContent.value=sl.content||""; els.pptSlideTitle.focus(); setStatus("PPT 순서를 입력창으로 불러왔습니다. 수정하면 자동 반영됩니다", "ok"); });
         card.querySelector("[data-edit]").addEventListener("click",()=>{ const title=prompt("PPT 제목 수정", sl.title||""); if(title===null) return; const content=prompt("PPT 내용 수정", sl.content||""); if(content===null) return; sl.title=title.trim(); sl.content=content.trim(); sl.updatedAtClient=new Date().toISOString(); persistSermon(cur); });
         card.querySelector("[data-del]").addEventListener("click",()=>{ if(!confirm("이 PPT 순서를 삭제할까요?")) return; cur.pptSlides=list.filter(x=>x.id!==sl.id); persistSermon(cur); });
         els.pptSlideList.appendChild(card);
@@ -962,7 +1035,7 @@ service cloud.firestore {
       saveCurrent({silent:true});
       const cur=collectCurrent();
       els.readerTitle.textContent=cur.title||"제목 없음";
-      els.readerMeta.textContent=`${formatDate(cur.sermonDate||nextSunday())} · ${cur.passage||"본문 미입력"} · ${cur.structure||""}`;
+      els.readerMeta.textContent=[formatDate(cur.sermonDate||nextSunday()), cur.passage||"본문 미입력", cur.learningPassage?`배울말씀: ${cur.learningPassage}`:"", cur.memoryVerse?`외울말씀: ${cur.memoryVerse}`:"", cur.structure||""].filter(Boolean).join(" · ");
       els.readerContent.textContent=cur.manuscript||"원고 미작성";
       els.readerSheet.style.fontSize=readerFontSize+"px";
       els.manuscriptFullModal.classList.add("open");
@@ -1053,7 +1126,7 @@ service cloud.firestore {
       else { (e.shiftKey ? textareas[textareas.length-1] : textareas[0])?.focus(); }
     }
 
-    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:11,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
+    function exportJson(){ saveCurrent({silent:true}); const payload={app:"sermonLog",version:17,room:state.room,updateNotes:state.updateNotes,updateHistory:state.updateHistory,reflectionBox:state.reflectionBox,prepQuestionBox:state.prepQuestionBox,exportedAt:new Date().toISOString(),sermons:sermonsArray(false)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`설교일지_백업_${today()}.json`; a.click(); URL.revokeObjectURL(a.href); }
     async function importJson(){ const file=els.importFile.files?.[0]; if(!file) return alert("불러올 JSON 파일을 선택하세요."); try{ const data=JSON.parse(await file.text()); const arr=Array.isArray(data)?data:(data.sermons||[]); if(data.updateNotes){ state.updateNotes=data.updateNotes; } if(Array.isArray(data.updateHistory)) state.updateHistory=data.updateHistory; if(Array.isArray(data.reflectionBox)) state.reflectionBox=mergeQuestionBoxes(state.reflectionBox,data.reflectionBox); if(Array.isArray(data.prepQuestionBox)) state.prepQuestionBox=mergeQuestionBoxes(state.prepQuestionBox,data.prepQuestionBox); await saveSystemDoc(); renderUpdatePreview(); renderReflectionBox(); if(!arr.length) return alert("설교일지 데이터가 없습니다."); for(const item of arr){ const id=item.id||uid(); const s=normalizeSermon({...item,id,localOnly:false,updatedAtClient:new Date().toISOString()}); state.sermons[id]=s; await saveSermon(s); } state.currentId=arr[0].id; saveLocal(); renderAll(); alert("백업을 불러왔습니다."); }catch(e){ console.error(e); alert("JSON 파일을 읽지 못했습니다."); } }
 
     function handleShortcuts(e){
