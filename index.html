@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>설교일지 v1.18 · Firestore 동기화</title>
+  <title>설교일지 v1.19 · Firestore 동기화</title>
   <style>
     :root{
       --bg:#f6f4ef;--paper:#fffdf8;--card:#fff;--ink:#1d211f;--muted:#6f746f;--line:#e2ddd2;
@@ -58,7 +58,7 @@
 <body data-mobile-panel="edit">
   <div class="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.18</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
+      <div class="brand"><div class="brand-mark">말씀</div><div><h1>설교일지 <span id="appVersion" class="version-badge">v1.19</span></h1><p>준비 · 성찰 · 원고 · 피드백 · 할 일 · 퀴즈 · Firestore 동기화</p></div></div>
       <div class="top-actions">
         <span class="pill"><span id="syncDot" class="dot warn"></span><span id="syncText">연결 준비</span></span>
         <span class="pill hide-mobile" id="countPill">0편</span>
@@ -209,7 +209,7 @@ service cloud.firestore {
       <div><b>Delete</b></div><div>현재 설교 삭제. 단, 입력칸에 커서가 있을 때는 글자 삭제가 우선입니다.</div>
       <div><b>Ctrl+P</b></div><div>A4 원고 인쇄</div>
       <div><b>Ctrl+S</b></div><div>업데이트 창이 열려 있으면 업데이트 저장, 아니면 현재 설교 저장</div>
-      <div><b>Ctrl+U</b></div><div>업데이트 기록창 열기</div>
+      <div><b>Ctrl+U</b></div><div>업데이트 기록창 열기/닫기</div>
       <div><b>Ctrl+Q</b></div><div>준비질문 탭</div>
       <div><b>Ctrl+Shift+W</b></div><div>성찰질문 탭. Ctrl+W는 크롬에서 탭 닫기 예약키라 일부 환경에서 차단이 안 됩니다.</div>
       <div><b>Ctrl+T</b></div><div>할 일 탭</div>
@@ -531,8 +531,7 @@ service cloud.firestore {
       n.quizzes = Array.isArray(n.quizzes) ? n.quizzes : [];
       n.pptSlides = Array.isArray(n.pptSlides) ? n.pptSlides : [];
       n.learningPassages = Array.isArray(n.learningPassages) ? n.learningPassages : splitLearningPassageText(n.learningPassage || "");
-      n.learningPassage = n.learningPassages.filter(Boolean).join("
-") || (n.learningPassage || "");
+      n.learningPassage = n.learningPassages.filter(Boolean).join("\n") || (n.learningPassage || "");
       n.memoryVerseText = n.memoryVerseText || "";
       if(!Array.isArray(n.prepQuestions) || !n.prepQuestions.length) resetPrepQuestionData(n, false);
       if(!Array.isArray(n.reflectionQuestions) || !n.reflectionQuestions.length) resetReflectionQuestionData(n, false);
@@ -573,8 +572,7 @@ service cloud.firestore {
 
     function collectCurrent(){
       const cur=currentOrCreate();
-      cur.sermonDate=els.sermonDate.value || nextSunday(); cur.dateDisplay=formatDate(cur.sermonDate); cur.structure=els.structureSelect.value || "서론-본론-결론"; cur.title=els.titleInput.value.trim(); cur.passage=els.passageInput.value.trim(); cur.passageUrl=els.passageUrlInput.value.trim(); cur.learningPassages=getLearningPassages(); cur.learningPassage=cur.learningPassages.filter(Boolean).join("
-"); cur.memoryVerse=els.memoryVerseInput?.value.trim() || ""; cur.memoryVerseText=els.memoryVerseText?.value.trim() || ""; cur.audience=els.audienceInput.value.trim(); cur.keywords=els.keywordsInput.value.trim(); cur.theme=els.themeInput.value.trim(); cur.onePoint=els.onePointInput.value.trim(); cur.purpose=els.purposeInput.value.trim(); cur.textNote=els.textNoteInput.value.trim(); cur.summary=els.summaryInput.value.trim(); cur.manuscript=els.manuscriptInput.value;
+      cur.sermonDate=els.sermonDate.value || nextSunday(); cur.dateDisplay=formatDate(cur.sermonDate); cur.structure=els.structureSelect.value || "서론-본론-결론"; cur.title=els.titleInput.value.trim(); cur.passage=els.passageInput.value.trim(); cur.passageUrl=els.passageUrlInput.value.trim(); cur.learningPassages=getLearningPassages(); cur.learningPassage=cur.learningPassages.filter(Boolean).join("\n"); cur.memoryVerse=els.memoryVerseInput?.value.trim() || ""; cur.memoryVerseText=els.memoryVerseText?.value.trim() || ""; cur.audience=els.audienceInput.value.trim(); cur.keywords=els.keywordsInput.value.trim(); cur.theme=els.themeInput.value.trim(); cur.onePoint=els.onePointInput.value.trim(); cur.purpose=els.purposeInput.value.trim(); cur.textNote=els.textNoteInput.value.trim(); cur.summary=els.summaryInput.value.trim(); cur.manuscript=els.manuscriptInput.value;
       cur.pptSlides = Array.isArray(cur.pptSlides) ? cur.pptSlides : []; cur.prepAnswers=collectPrepAnswers(cur); cur.reflectionAnswers=collectReflectionAnswers(cur); syncPostSermonFeedback(cur); cur.updatedAtClient=new Date().toISOString(); cur.localOnly=!hasSermonContent(cur); state.sermons[cur.id]=cur; return cur;
     }
     function collectPrepAnswers(cur=current()){ const old={...(cur?.prepAnswers||{})}; document.querySelectorAll("[data-prep-key]").forEach(t => { old[t.dataset.prepKey]=t.value; }); return old; }
@@ -1256,7 +1254,7 @@ ${blank}`, options:`외울말씀 빈칸퀴즈 · 난이도 ${levelName} · 빈�
       let combo = `${shift?"shift+":""}${alt?"alt+":""}${key}`;
       const actions = {
         "s":()=>{ if(els.updateModal.classList.contains("open")) saveUpdateLog(); else saveCurrent(); },
-        "p":()=>printCurrent(), "u":()=>openUpdateLog(), "shift+n":()=>createSermon(true), "q":()=>showTab("prep"),
+        "p":()=>printCurrent(), "u":()=>{ els.updateModal.classList.contains("open") ? closeUpdateLog() : openUpdateLog(); }, "shift+n":()=>createSermon(true), "q":()=>showTab("prep"),
         "shift+w":()=>showTab("reflect"),
         "w":()=>{ showTab("reflect"); setStatus("Ctrl+W는 크롬 예약키라 실패하면 Ctrl+Shift+W를 사용하세요","warn"); },
         "t":()=>showTab("tasks"), "m":()=>toggleQuickMemo(), "b":()=>openExternal(BIBLE_URL), "g":()=>openExternal(GPT_URL),
